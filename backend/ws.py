@@ -3,16 +3,30 @@ import websockets
 import json
 import game
 import threading
+from datetime import datetime
 
+def on_pause_button_pressed():
+    if game.game_active:
+        game.pause()
+    else:
+        game.unpause()
 
-async def handler(websocket, path):
-    try:
-        while True:
-            message = json.dumps(game.players)
-            await websocket.send(message)
-            await asyncio.sleep(0.1)
-    except websockets.exceptions.ConnectionClosedError:
-        pass
+async def recieve_messages(websocket):
+    async for message in websocket:
+        if json.loads(message)== "button_pressed":
+            on_pause_button_pressed()
+        if json.loads(message)== "reset":
+            game.reset()
+
+async def send_messages(websocket):
+    while True:
+        state = game.get_state()
+        message = json.dumps(state["players"])
+        await asyncio.sleep(0.01)
+        await websocket.send(message)
+
+async def handler(websocket):
+    await asyncio.gather(recieve_messages(websocket),send_messages(websocket))
 
 async def main():
     server = await websockets.serve(handler, 'localhost', 8765)

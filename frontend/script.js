@@ -4,9 +4,8 @@ var players;
 
 function draw_players(ctx){
     if (!players)return;
-    console.log(players);
     for (let player of players){
-        console.log(player.position.x,player.position.y);
+        ctx.beginPath();
         ctx.fillStyle = 'red';
         const radius = 50;
         ctx.arc(player.position.x, player.position.y, radius, 0, 2 * Math.PI, false);
@@ -16,7 +15,6 @@ function draw_players(ctx){
         ctx.font = "15px Arial";
         ctx.textAlign = "center";
         ctx.fillText(player.name, player.position.x, player.position.y+65); 
-
 
         ctx.fillStyle = 'red';
         ctx.fillRect(player.position.x-50, player.position.y+70, 100, 10);
@@ -35,6 +33,12 @@ function game_loop(){
     window.requestAnimationFrame(game_loop);
 }
 
+function startButton(event) {
+    const data = event.currentTarget.button;
+    event.currentTarget.websocket.send(JSON.stringify(data));
+    console.log(event.currentTarget.button)
+}
+
 window.addEventListener("DOMContentLoaded", () => {
     // Initialize the UI.
     const canvas = document.querySelector("#game-canvas");
@@ -44,7 +48,18 @@ window.addEventListener("DOMContentLoaded", () => {
         players = JSON.parse(data);
       });
     
+    const start_btn = document.querySelector("#start-btn");
+    start_btn.addEventListener("click", startButton);
+    start_btn.websocket = websocket;
+    start_btn.button = "button_pressed";
+
+    const reset_btn = document.querySelector("#reset-btn");
+    reset_btn.addEventListener("click", startButton);
+    reset_btn.websocket = websocket;
+    reset_btn.button = "reset";
 
   });
+
+  
 
 game_loop();
