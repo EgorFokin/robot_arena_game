@@ -24,8 +24,14 @@ class Vector():
         else:
             return Vector(self.x / 0.001, self.y / 0.001)
 
+    def __str__(self):
+        return f"({self.x},{self.y})"
+    
+    def __repr__(self):
+        return f"({self.x},{self.y})"
+
     def mag(self):
-        return math.sqrt(self.x ** 2 + self.y ** 2)
+        return 0 if self.x==0 and self.y ==0 else math.sqrt(self.x ** 2 + self.y ** 2) 
     
     def norm(self):
         return self/self.mag()
@@ -34,4 +40,4 @@ class Vector():
         return self.x*b.x+self.y*b.y
     
     def proj(self,b):
-        return self.dot(b)/self.mag()**2*b
+        return Vector(0,0) if self.mag()==0 else self.dot(b)/(b.mag()**2)*b

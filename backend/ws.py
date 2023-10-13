@@ -13,10 +13,14 @@ def on_pause_button_pressed():
 
 async def recieve_messages(websocket):
     async for message in websocket:
-        if json.loads(message)== "button_pressed":
-            on_pause_button_pressed()
-        if json.loads(message)== "reset":
-            game.reset()
+        data = json.loads(message)
+        match data["type"]:
+            case "button_press":
+                match data["content"]:
+                    case "start":
+                        on_pause_button_pressed()
+                    case "reset":
+                        game.reset()
 
 async def send_messages(websocket):
     while True:

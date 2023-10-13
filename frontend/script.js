@@ -33,10 +33,9 @@ function game_loop(){
     window.requestAnimationFrame(game_loop);
 }
 
-function startButton(event) {
-    const data = event.currentTarget.button;
+function on_button_pressed(event) {
+    const data = {type:"button_press",content:event.currentTarget.action};
     event.currentTarget.websocket.send(JSON.stringify(data));
-    console.log(event.currentTarget.button)
 }
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -49,14 +48,14 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     
     const start_btn = document.querySelector("#start-btn");
-    start_btn.addEventListener("click", startButton);
+    start_btn.addEventListener("click", on_button_pressed);
     start_btn.websocket = websocket;
-    start_btn.button = "button_pressed";
+    start_btn.action = "start";
 
     const reset_btn = document.querySelector("#reset-btn");
-    reset_btn.addEventListener("click", startButton);
+    reset_btn.addEventListener("click", on_button_pressed);
     reset_btn.websocket = websocket;
-    reset_btn.button = "reset";
+    reset_btn.action = "reset";
 
   });
 
