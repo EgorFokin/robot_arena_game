@@ -41,10 +41,13 @@ function draw_weapon(ctx, player){
     let closest_player = get_closest_player(player);
     if (closest_player.position.x<player.position.x)ctx.scale(-1, 1);
     else ctx.scale(1, 1);
-    if (!weapon_frames[player.name] || weapon_frames[player.name]==Math.floor(1/weapon_speed))weapon_frames[player.name] = 0;
-    ctx.rotate(weapon_frames[player.name]/Math.floor(1/weapon_speed)*weapon_angle*(Math.PI/180));
-    weapon_frames[player.name]++;
-    ctx.drawImage(player_sprites.weapon[player.appearance.weapon], 0, -100, 100, 100);
+    if (Math.hypot(player.position.x-closest_player.position.x, player.position.y-closest_player.position.y)<150){
+        if (!weapon_frames[player.name] || weapon_frames[player.name]==Math.floor(1/weapon_speed))weapon_frames[player.name] = 0;
+        ctx.rotate(weapon_frames[player.name]/Math.floor(1/weapon_speed)*weapon_angle*(Math.PI/180));
+        weapon_frames[player.name]++;
+    }
+    
+    ctx.drawImage(player_sprites.weapon[player.appearance.weapon],0, -100, 100, 100);
     ctx.restore();
 }
 
@@ -62,9 +65,9 @@ function draw(ctx){
         ctx.fillText(player.name, player.position.x, player.position.y+65); 
 
         ctx.fillStyle = 'red';
-        ctx.fillRect(player.position.x-50, player.position.y+70, 100, 10);
+        ctx.fillRect(player.position.x-50, player.position.y+70, 100, 5);
         ctx.fillStyle = 'green';
-        ctx.fillRect(player.position.x-50, player.position.y+70, player.health, 10);
+        ctx.fillRect(player.position.x-50, player.position.y+70, player.health, 5);
     }
 }
 
@@ -116,7 +119,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const websocket = new WebSocket("ws://localhost:8765/");
 
     
-    background_img.src = "assets/background.jfif";
+    background_img.src = "assets/background2.webp";
 
     websocket.addEventListener("message", ({ data }) => {
         players = JSON.parse(data);
