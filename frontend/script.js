@@ -1,8 +1,11 @@
 var players;
+var boxes;
 var damage_events = [];
 var player_sprites={"body":{}, "head":{}, "bracelet":{}, "pendant":{}, "weapon":{}};
+var hit_sprite = new Image();
 var weapon_frames={};
 var background_img = new Image();
+var box_img = new Image();
 var weapon_speed = 0.03;
 var weapon_angle = 90;
 var dmg_dealt;
@@ -54,35 +57,51 @@ function draw_weapon(ctx, player){
 }
 
 function draw_damage_events(ctx){
+    ctx.save();
     if (!damage_events)return;
     for (let damage_event of damage_events){
         ctx.fillStyle = 'red';
         ctx.font = `bold ${10+Math.floor(damage_event.dmg)}px Courier New` ;
         ctx.textAlign = "center";
-        ctx.fillText(damage_event.dmg, damage_event.x, damage_event.y-damage_event.frame/2); 
+        ctx.fillText(damage_event.dmg.toString()+(damage_event.dmg > 8 ? " Crit!" :""), damage_event.x, damage_event.y-damage_event.frame/2); 
         damage_event.frame+=1;
-    }
+        if (damage_event.frame<50){
+            ctx.drawImage(hit_sprite,200*(Math.floor(damage_event.frame/20)%5),200*Math.floor(damage_event.frame/25),200,200, damage_event.x-50, damage_event.y-50,100,100)
+        }
+        }
     for (let i=damage_events.length-1; i>=0; i--){
         if (damage_events[i].frame>100){
             damage_events.splice(i, 1);
         }
     }
+    ctx.restore();
+}
+
+function draw_boxes(ctx){
+    ctx.save();
+    if (!boxes)return;
+    for (let box of boxes){
+        ctx.fillStyle = 'brown';
+        ctx.drawImage(box_img,box.position.x-25, box.position.y-25, 50, 50);
+    }
+    ctx.restore();
 }
 
 function draw(ctx){
     ctx.drawImage(background_img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-    
+    draw_damage_events(ctx);
+    draw_boxes(ctx);
     if (!players)return;
     for (let player of players){
         draw_player_body(ctx, player);
         draw_weapon(ctx, player);
-
+        
+        ctx.textAlign = "center";
+        ctx.font = "bold 15px Courier New";
         ctx.strokeStyle = 'black'; 
         ctx.lineWidth = 5; 
         ctx.strokeText(player.name, player.position.x, player.position.y+65);
         ctx.fillStyle = player.team;
-        ctx.font = "bold 15px Courier New";
-        ctx.textAlign = "center";
         ctx.fillText(player.name, player.position.x, player.position.y+65); 
 
         ctx.fillStyle = 'red';
@@ -90,10 +109,10 @@ function draw(ctx){
         ctx.fillStyle = 'green';
         ctx.fillRect(player.position.x-50, player.position.y+70, player.health, 5);
     }
-    draw_damage_events(ctx);
+    
 }
 
-function load_sprites(){
+function load_player_sprites(){
     
     for (let player of players){
         if (!player_sprites.body[player.appearance.body]){
@@ -142,15 +161,22 @@ window.addEventListener("DOMContentLoaded", () => {
 
     
     background_img.src = "assets/a844fb83-ba9b-4fc2-82b3-80d9890289cf.png";
+    hit_sprite.src = "assets/hit_animation.png";
+    box_img.src = "assets/box.png";
 
     websocket.addEventListener("message", ({ data }) => {
         state = JSON.parse(data);
-        players = state.players;
+        players = []
+        boxes = []
+        for (let object of state.active_objects){
+            if (object.type == "player")players.push(object);
+            if (object.type=="box")boxes.push(object);
+        }
         for (let damage_event of state.damage_events){
             damage_events.push({x:damage_event.x, y:damage_event.y, dmg:damage_event.damage, frame:0});
             
         }
-        load_sprites();
+        load_player_sprites();
       });
     
     const start_btn = document.querySelector("#start-btn");
