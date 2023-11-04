@@ -45,16 +45,28 @@ def check_for_border_collisions():
     for object in active_objects:
         if (object.position.y+object.collision_radius > 615):
             object.position.y = 615 - object.collision_radius
-            object.velocity.y = -object.velocity.y*0.7
+            if type(object) == Box:
+                object.velocity.y = -object.velocity.y*0.2
+            else:
+                object.velocity.y = -object.velocity.y*0.7
         if (object.position.y-object.collision_radius < 0):
             object.position.y = object.collision_radius
-            object.velocity.y = -object.velocity.y*0.7
+            if type(object) == Box:
+                object.velocity.y = -object.velocity.y*0.2
+            else:
+                object.velocity.y = -object.velocity.y*0.7
         if (object.position.x-object.collision_radius < 0):
             object.position.x = object.collision_radius
-            object.velocity.x = -object.velocity.x*0.7
+            if type(object) == Box:
+                object.velocity.x = -object.velocity.x*0.2
+            else:
+                object.velocity.x = -object.velocity.x*0.7
         if (object.position.x+object.collision_radius > 1500):
             object.position.x = 1500 - object.collision_radius
-            object.velocity.x = -object.velocity.x*0.7
+            if type(object) == Box:
+                object.velocity.x = -object.velocity.x*0.2
+            else:
+                object.velocity.x = -object.velocity.x*0.7
 
 
 def apply_velocity(td):
@@ -98,12 +110,19 @@ def calculate_collisions():
                 collision_v = (active_objects[i].velocity.proj(direction).mag(
                 ) + active_objects[j].velocity.proj(direction).mag())*direction/2
 
-                active_objects[i].velocity -= active_objects[i].velocity.proj(
-                    direction)
-                active_objects[i].velocity += collision_v
-                active_objects[j].velocity -= active_objects[j].velocity.proj(
-                    direction)
-                active_objects[j].velocity -= collision_v
+                if type(active_objects[i]) == Box:
+                    active_objects[i].velocity += (collision_v - active_objects[i].velocity.proj(
+                        direction))*0.5
+                else:
+                    active_objects[i].velocity += collision_v - active_objects[i].velocity.proj(
+                        direction)
+                if type(active_objects[j]) == Box:
+                    active_objects[j].velocity += (Vector(0, 0)-collision_v - active_objects[j].velocity.proj(
+                        direction))*0.5
+                else:
+                    active_objects[j].velocity += Vector(0, 0)-collision_v - active_objects[j].velocity.proj(
+                        direction)
+
                 if type(active_objects[i]) == Player and type(active_objects[j]) == Player and active_objects[i].team != active_objects[j].team:
                     if (grace_period <= 0):
                         damage = random.uniform(1, 10)
@@ -137,7 +156,7 @@ def spawn_boxes():
     # spawns boxes at random locations
     global active_objects
     for i in range(10):
-        active_objects.append(Box(Vector(random.randint(50, 1500),
+        active_objects.append(Box(Vector(random.randint(600, 900),
                                          random.randint(50, 550)),
                                   Vector(0, 0)))
 
