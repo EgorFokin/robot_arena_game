@@ -25,7 +25,7 @@ async def recieve_messages(websocket):
 async def send_messages(websocket):
     while True:
         state = game.get_state()
-        message = json.dumps(state["players"])
+        message = json.dumps(state)
         await asyncio.sleep(0.01)
         await websocket.send(message)
         

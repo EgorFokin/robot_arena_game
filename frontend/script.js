@@ -1,4 +1,5 @@
 var players;
+var damage_events = [];
 var player_sprites={"body":{}, "head":{}, "bracelet":{}, "pendant":{}, "weapon":{}};
 var weapon_frames={};
 var background_img = new Image();
@@ -52,6 +53,22 @@ function draw_weapon(ctx, player){
     ctx.restore();
 }
 
+function draw_damage_events(ctx){
+    if (!damage_events)return;
+    for (let damage_event of damage_events){
+        ctx.fillStyle = 'red';
+        ctx.font = `bold ${10+Math.floor(damage_event.dmg)}px Courier New` ;
+        ctx.textAlign = "center";
+        ctx.fillText(damage_event.dmg, damage_event.x, damage_event.y-damage_event.frame/2); 
+        damage_event.frame+=1;
+    }
+    for (let i=damage_events.length-1; i>=0; i--){
+        if (damage_events[i].frame>100){
+            damage_events.splice(i, 1);
+        }
+    }
+}
+
 function draw(ctx){
     ctx.drawImage(background_img, 0, 0, ctx.canvas.width, ctx.canvas.height);
     
@@ -60,7 +77,9 @@ function draw(ctx){
         draw_player_body(ctx, player);
         draw_weapon(ctx, player);
 
-
+        ctx.strokeStyle = 'black'; 
+        ctx.lineWidth = 5; 
+        ctx.strokeText(player.name, player.position.x, player.position.y+65);
         ctx.fillStyle = player.team;
         ctx.font = "bold 15px Courier New";
         ctx.textAlign = "center";
@@ -70,9 +89,8 @@ function draw(ctx){
         ctx.fillRect(player.position.x-50, player.position.y+70, 100, 5);
         ctx.fillStyle = 'green';
         ctx.fillRect(player.position.x-50, player.position.y+70, player.health, 5);
-
-
     }
+    draw_damage_events(ctx);
 }
 
 function load_sprites(){
@@ -126,7 +144,12 @@ window.addEventListener("DOMContentLoaded", () => {
     background_img.src = "assets/a844fb83-ba9b-4fc2-82b3-80d9890289cf.png";
 
     websocket.addEventListener("message", ({ data }) => {
-        players = JSON.parse(data);
+        state = JSON.parse(data);
+        players = state.players;
+        for (let damage_event of state.damage_events){
+            damage_events.push({x:damage_event.x, y:damage_event.y, dmg:damage_event.damage, frame:0});
+            
+        }
         load_sprites();
       });
     

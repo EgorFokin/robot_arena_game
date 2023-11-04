@@ -20,6 +20,8 @@ team_count =   4
 teams = ["red", "blue", "green", "yellow"]
 teams = teams[:team_count]
 
+damage_events = []
+
 
 GRAVITY = 200
 PLAYER_NUM = 10
@@ -68,7 +70,10 @@ def apply_random_impulses():
     global players
     impulse_players = random.sample(players,random.randint(1,math.ceil(len(players)/2)))
     for player in impulse_players:
-        player["velocity"]+=(random.choice(players)["position"]-player["position"])*0.7
+        target = random.choice(players)
+        while target["team"]==player["team"]:
+            target = random.choice(players)
+        player["velocity"]+=(target["position"]-player["position"])*0.7
          
 
 def calculate_collisions():
@@ -86,10 +91,13 @@ def calculate_collisions():
                players[j]["velocity"]-=collision_v
                if players[i]["team"] != players[j]["team"]:
                     if (grace_period<=0):
+                         damage = random.uniform(1,10)
                          if random.randint(0,1):
-                              players[i]["health"]-=5
+                              players[i]["health"]-=damage
                          else:
-                              players[j]["health"]-=5
+                              players[j]["health"]-=damage
+                         center = (players[i]["position"]+players[j]["position"])/2
+                         damage_events.append({"x":center.x,"y":center.y,"damage":"{:.2f}".format(damage)})
                          
                          
 
@@ -155,7 +163,8 @@ def reset():
 
 
 def get_state():
-     state = {"players":[]}
+     state = {"players":[],"damage_events":damage_events[:]}
+     damage_events.clear()
      for player in players:
           state["players"].append({"name":player["name"],
                                   "position":{"x":player["position"].x,"y":player["position"].y},
