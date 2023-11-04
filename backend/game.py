@@ -10,15 +10,19 @@ game_active = False
 
 players = []
 
-apperances = {"body":["Champion","Destruction","Drift","Force","Invisible","Master","Sphere","Warrior"],
+apperances = {
               "bracelet":["Broken Rolex","Golden Cartier","Rolex Watch","Rope"],
               "head":["Bone","Crystal","Defense","Fiend","Intellect","Samurai","Teleport","Titan"],
               "pendant":["Dollar sign","Golden Chain","Golden Sol","Silver Lock"],
               "weapon":["Baseball Bat","Claws","Katana","Knife","Knuckles","Nunchaku","Sai","Sword"]}
 
+team_count =   4
+teams = ["red", "blue", "green", "yellow"]
+teams = teams[:team_count]
 
-GRAVITY = 100
-PLAYER_NUM = 20
+
+GRAVITY = 200
+PLAYER_NUM = 10
 
 impulse_cooldown = 0
 grace_period = 3
@@ -43,8 +47,8 @@ def check_for_border_collisions():
         if (player["position"].x<50):
              player["position"].x = 50
              player["velocity"].x = -player["velocity"].x*0.7
-        if (player["position"].x>1300):
-             player["position"].x = 1300
+        if (player["position"].x>1500):
+             player["position"].x = 1500
              player["velocity"].x = -player["velocity"].x*0.7
     
 def apply_velocity(td):
@@ -64,7 +68,7 @@ def apply_random_impulses():
     global players
     impulse_players = random.sample(players,random.randint(1,math.ceil(len(players)/2)))
     for player in impulse_players:
-        player["velocity"]+=(random.choice(players)["position"]-player["position"])
+        player["velocity"]+=(random.choice(players)["position"]-player["position"])*0.7
          
 
 def calculate_collisions():
@@ -72,7 +76,7 @@ def calculate_collisions():
      global players
      for i in range(len(players)):
         for j in range(i+1,len(players)):
-             if  (players[j]["position"]-players[i]["position"]).mag()<100:
+             if  (players[j]["position"]-players[i]["position"]).mag()<70:
                   
                direction = (players[i]["position"]-players[j]["position"]).norm()
                collision_v = (players[i]["velocity"].proj(direction).mag() +players[j]["velocity"].proj(direction).mag())*direction/2
@@ -80,25 +84,32 @@ def calculate_collisions():
                players[i]["velocity"]+=collision_v
                players[j]["velocity"]-=players[j]["velocity"].proj(direction)
                players[j]["velocity"]-=collision_v
-               if (grace_period<=0):
-                    if random.randint(0,1):
-                         players[i]["health"]-=0.1
-                    else:
-                         players[j]["health"]-=0.1
+               if players[i]["team"] != players[j]["team"]:
+                    if (grace_period<=0):
+                         if random.randint(0,1):
+                              players[i]["health"]-=5
+                         else:
+                              players[j]["health"]-=5
+                         
+                         
 
 def populate_players():
     #populates the players list with random players
     global players
     players = []
     for i in range(PLAYER_NUM):
+        team_index = random.randint(0, len(teams)-1)
+        team_color = teams[team_index]
+        head = random.choice(apperances["head"])
         players.append({"name":"player"+str(i),
-                        "position":Vector(random.randint(50,1300),random.randint(50,550)),
+                        "position":Vector(random.randint(50, (1500//len(teams))) + (1500//len(teams)) * (team_index) ,random.randint(50,550)),
                         "velocity":Vector(0,0),"health":100,
-                        "appearance":{"head":random.choice(apperances["head"]),
-                                     "body":random.choice(apperances["body"]),
+                        "appearance":{"head":head,
+                                     "body":head + "_body",
                                      "pendant":random.choice(apperances["pendant"]),
                                      "bracelet":random.choice(apperances["bracelet"]),
-                                     "weapon":random.choice(apperances["weapon"])}})
+                                     "weapon":random.choice(apperances["weapon"])},
+                         "team":team_color})
 
 def update():
      
@@ -149,5 +160,6 @@ def get_state():
           state["players"].append({"name":player["name"],
                                   "position":{"x":player["position"].x,"y":player["position"].y},
                                   "health":player["health"],
-                                  "appearance":player["appearance"]})
+                                  "appearance":player["appearance"],
+                                  "team":player["team"]})
      return state

@@ -28,6 +28,7 @@ async def send_messages(websocket):
         message = json.dumps(state["players"])
         await asyncio.sleep(0.01)
         await websocket.send(message)
+        
 
 async def handler(websocket):
     await asyncio.gather(recieve_messages(websocket),send_messages(websocket))

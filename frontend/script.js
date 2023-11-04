@@ -1,16 +1,16 @@
-
-
 var players;
 var player_sprites={"body":{}, "head":{}, "bracelet":{}, "pendant":{}, "weapon":{}};
 var weapon_frames={};
 var background_img = new Image();
-var weapon_speed=0.02;
+var weapon_speed = 0.03;
 var weapon_angle = 90;
+var dmg_dealt;
 
 function get_closest_player(player){
     let closest_player = null;
     for (let p of players){
         if (p.name == player.name)continue;
+        if (p.team == player.team)continue;
         if (!closest_player)closest_player = p;
         if (Math.hypot(player.position.x-p.position.x, player.position.y-p.position.y) < Math.hypot(player.position.x-closest_player.position.x, player.position.y-closest_player.position.y)){
             closest_player = p;
@@ -18,6 +18,7 @@ function get_closest_player(player){
     }
     return closest_player
 }
+
 
 function draw_player_body(ctx, player){
 
@@ -37,7 +38,7 @@ function draw_player_body(ctx, player){
 
 function draw_weapon(ctx, player){
     ctx.save();
-    ctx.translate(player.position.x, player.position.y);
+    ctx.translate(player.position.x-10, player.position.y+50);
     let closest_player = get_closest_player(player);
     if (closest_player.position.x<player.position.x)ctx.scale(-1, 1);
     else ctx.scale(1, 1);
@@ -47,7 +48,7 @@ function draw_weapon(ctx, player){
         weapon_frames[player.name]++;
     }
     
-    ctx.drawImage(player_sprites.weapon[player.appearance.weapon],0, -100, 100, 100);
+    ctx.drawImage(player_sprites.weapon[player.appearance.weapon],0, -100-10, 100, 100);
     ctx.restore();
 }
 
@@ -59,8 +60,9 @@ function draw(ctx){
         draw_player_body(ctx, player);
         draw_weapon(ctx, player);
 
-        ctx.fillStyle = 'black';
-        ctx.font = "15px Arial";
+
+        ctx.fillStyle = player.team;
+        ctx.font = "bold 15px Courier New";
         ctx.textAlign = "center";
         ctx.fillText(player.name, player.position.x, player.position.y+65); 
 
@@ -68,6 +70,8 @@ function draw(ctx){
         ctx.fillRect(player.position.x-50, player.position.y+70, 100, 5);
         ctx.fillStyle = 'green';
         ctx.fillRect(player.position.x-50, player.position.y+70, player.health, 5);
+
+
     }
 }
 
@@ -119,7 +123,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const websocket = new WebSocket("ws://localhost:8765/");
 
     
-    background_img.src = "assets/background2.webp";
+    background_img.src = "assets/a844fb83-ba9b-4fc2-82b3-80d9890289cf.png";
 
     websocket.addEventListener("message", ({ data }) => {
         players = JSON.parse(data);

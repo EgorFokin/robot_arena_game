@@ -29,6 +29,7 @@ class Vector():
     
     def __repr__(self):
         return f"({self.x},{self.y})"
+    
 
     def mag(self):
         return 0 if self.x==0 and self.y ==0 else math.sqrt(self.x ** 2 + self.y ** 2) 
