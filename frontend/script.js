@@ -172,14 +172,21 @@ function game_loop(){
                 if (state.previous_winner == current_bet.team){
                     coins+=current_bet.amount*2;
                     document.querySelector("#congratulations").innerHTML = `Your won ${current_bet.amount*2} coins!`;
+                    document.querySelector("#congratulations").style.color = "green";
                 }
                 else{
                     document.querySelector("#congratulations").innerHTML = `Your lost :( Better luck next time!`;
+                    document.querySelector("#congratulations").style.color = "red";
                 }
                 
                 current_bet = {
                     "team":null,
                     "amount":null}
+                    if (current_bet.amount){
+                        document.querySelector("#your_bet").innerHTML = `Your bet: ${current_bet.team}: ${current_bet.amount} coins`;
+                        document.querySelector("#your_bet").style.color = current_bet.team;
+                    }
+                    else document.querySelector("#your_bet").innerHTML = "";
                     document.querySelector("#coins").innerHTML = `Your coins: ${coins - current_bet.amount}`;
             }
         }
@@ -195,9 +202,10 @@ function bet_button_pressed(event){
     current_bet.amount = document.querySelector(`#${team}_team_bet_amount`).value;
     if (current_bet.amount){
         document.querySelector("#your_bet").innerHTML = `Your bet: ${current_bet.team}: ${current_bet.amount} coins`;
-        document.querySelector("#your_bet").style.color = team;
+        document.querySelector("#your_bet").style.color = current_bet.team;
         document.querySelector("#coins").innerHTML = `Your coins: ${coins - current_bet.amount}`;
     }
+    else document.querySelector("#your_bet").innerHTML = "";
     
 
 }

@@ -7,10 +7,7 @@ from datetime import datetime
 
 
 def on_pause_button_pressed():
-    if game.phase == "game_active":
-        game.pause()
-    else:
-        game.unpause()
+    pass
 
 
 async def recieve_messages(websocket):

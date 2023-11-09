@@ -26,7 +26,8 @@ damage_events = []
 GRAVITY = 200
 PLAYER_NUM = 10
 BOX_NUM = 20
-PLAYER_HEALTH = 10
+DAMAGE_LOW = 1
+DAMAGE_HIGH = 10
 
 impulse_cooldown = 0
 grace_period = 3
@@ -126,7 +127,7 @@ def calculate_collisions():
 
                 if active_objects[i].team != active_objects[j].team:
                     if (grace_period <= 0):
-                        damage = random.uniform(1, 10)
+                        damage = random.uniform(DAMAGE_LOW, DAMAGE_HIGH)
                         if random.randint(0, 1):
                             active_objects[i].health -= damage
                         else:
@@ -189,7 +190,7 @@ def populate_players():
                               Vector(random.randint(50, (1500//len(teams))) + (1500//len(teams)) * (team_index),
                               random.randint(50, 550)),
                               Vector(0, 0),
-                              PLAYER_HEALTH,
+                              100,
                               {"head": head, "body": head + "_body", "pendant": random.choice(apperances["pendant"]),
                               "bracelet": random.choice(apperances["bracelet"]), "weapon": random.choice(apperances["weapon"])}, team_color))
 
@@ -246,18 +247,12 @@ def start_game():
                 phase = "game_active"
 
 
-def unpause():
-    global prev_update_datetime, grace_period, phase
-    grace_period = 3
-    prev_update_datetime = datetime.now()
-    phase = "game_active"
-
-
 def reset():
-    global active_objects
+    global active_objects, prev_update_datetime
     active_objects = []
     populate_players()
     spawn_boxes()
+    prev_update_datetime = datetime.now()
 
 
 def get_state():
