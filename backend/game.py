@@ -17,7 +17,7 @@ apperances = {
     "pendant": ["Dollar sign", "Golden Chain", "Golden Sol", "Silver Lock"],
     "weapon": ["Baseball Bat", "Claws", "Katana", "Knife", "Knuckles", "Nunchaku", "Sai", "Sword"]}
 
-team_count = 4
+team_count = 2
 teams = ["red", "blue", "green", "yellow"]
 teams = teams[:team_count]
 
@@ -26,6 +26,7 @@ damage_events = []
 
 GRAVITY = 200
 PLAYER_NUM = 10
+BOX_NUM = 20
 
 impulse_cooldown = 0
 grace_period = 3
@@ -74,8 +75,8 @@ def apply_velocity(td):
     global active_objects
     for object in active_objects:
         object.position += object.velocity*td
-        if type(object) == Box and object.position.x-object.collision_radius < 50:
-            object.velocity.x -= object.velocity.x*td*0.5
+        if type(object) == Box and object.position.y-object.collision_radius > 300:
+            object.velocity.x -= object.velocity.x*td*2
 
 
 def apply_gravity(td):
@@ -103,27 +104,20 @@ def calculate_collisions():
     global active_objects
     for i in range(len(active_objects)):
         for j in range(i+1, len(active_objects)):
-            if (active_objects[j].position-active_objects[i].position).mag() < active_objects[i].collision_radius + active_objects[j].collision_radius:
-
+            offset = active_objects[i].collision_radius + active_objects[j].collision_radius
+            if type(active_objects[i])==Player and type(active_objects[j])==Player and \
+                    (active_objects[j].position-active_objects[i].position).mag() < offset:
                 direction = (active_objects[i].position -
                              active_objects[j].position).norm()
                 collision_v = (active_objects[i].velocity.proj(direction).mag(
                 ) + active_objects[j].velocity.proj(direction).mag())*direction/2
 
-                if type(active_objects[i]) == Box:
-                    active_objects[i].velocity += (collision_v - active_objects[i].velocity.proj(
-                        direction))*0.5
-                else:
-                    active_objects[i].velocity += collision_v - active_objects[i].velocity.proj(
-                        direction)
-                if type(active_objects[j]) == Box:
-                    active_objects[j].velocity += (Vector(0, 0)-collision_v - active_objects[j].velocity.proj(
-                        direction))*0.5
-                else:
-                    active_objects[j].velocity += Vector(0, 0)-collision_v - active_objects[j].velocity.proj(
-                        direction)
+                active_objects[i].velocity += collision_v - active_objects[i].velocity.proj(
+                    direction)
+                active_objects[j].velocity += Vector(0, 0)-collision_v - active_objects[j].velocity.proj(
+                    direction)
 
-                if type(active_objects[i]) == Player and type(active_objects[j]) == Player and active_objects[i].team != active_objects[j].team:
+                if active_objects[i].team != active_objects[j].team:
                     if (grace_period <= 0):
                         damage = random.uniform(1, 10)
                         if random.randint(0, 1):
@@ -134,6 +128,47 @@ def calculate_collisions():
                                   active_objects[j].position)/2
                         damage_events.append(
                             {"x": center.x, "y": center.y, "damage": "{:.2f}".format(damage)})
+            
+            if type(active_objects[i])==Box and type(active_objects[j]) == Box and\
+                    abs(active_objects[i].position.x - active_objects[j].position.x)<offset and\
+                    abs(active_objects[i].position.y - active_objects[j].position.y)<offset:
+                
+                if abs(active_objects[i].position.y - active_objects[j].position.y) > abs(active_objects[i].position.x - active_objects[j].position.x):
+                    collision_v = ((active_objects[i].velocity.y)+(active_objects[j].velocity.y)) * 0.5
+                    if active_objects[i].position.y < active_objects[j].position.y:
+                        active_objects[i].position.y = active_objects[j].position.y - offset
+                    else:
+                        active_objects[j].position.y = active_objects[i].position.y - offset
+                    active_objects[i].velocity.y = collision_v
+                    active_objects[j].velocity.y = collision_v
+                else:
+                    collision_v = ((active_objects[i].velocity.x)+(active_objects[j].velocity.x)) * 0.5
+                    if active_objects[i].position.x < active_objects[j].position.x:
+                        active_objects[i].position.x = active_objects[j].position.x - offset
+                    else:
+                        active_objects[j].position.x = active_objects[i].position.x - offset
+                    active_objects[i].velocity.x = collision_v
+                    active_objects[j].velocity.x = collision_v
+                        
+            if set([type(active_objects[i]),type(active_objects[j])]) == set([Box,Player]):
+                if type(active_objects[i])==Box and type(active_objects[j])==Player:
+                    obj_box = active_objects[i]
+                    obj_player = active_objects[j]
+                else:
+                    obj_box = active_objects[j]
+                    obj_player = active_objects[i]
+                if (obj_box.calculate_col_point(obj_player)-obj_player.position).mag() < obj_player.collision_radius:
+                    direction = (obj_box.position -
+                             obj_player.position).norm()
+                    collision_v = (obj_box.velocity.proj(direction).mag(
+                    ) + obj_player.velocity.proj(direction).mag())*direction/2
+
+                    obj_box.velocity += (collision_v - obj_box.velocity.proj(
+                        direction))
+                    obj_player.velocity += Vector(0, 0) - collision_v - obj_player.velocity.proj(
+                        direction)
+
+
 
 
 def populate_players():
@@ -155,10 +190,10 @@ def populate_players():
 def spawn_boxes():
     # spawns boxes at random locations
     global active_objects
-    for i in range(10):
-        active_objects.append(Box(Vector(random.randint(600, 900),
-                                         random.randint(50, 550)),
-                                  Vector(0, 0)))
+    for i in range(7):
+        for j in range(2):
+            active_objects.append(Box(Vector(750 + j*40, 615 - i*40),
+                                    Vector(0, 0)))
 
 
 def update():

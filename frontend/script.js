@@ -4,7 +4,6 @@ var damage_events = [];
 var player_sprites={"body":{}, "head":{}, "bracelet":{}, "pendant":{}, "weapon":{}};
 var hit_sprite = new Image();
 var weapon_frames={};
-var background_img = new Image();
 var box_img = new Image();
 var weapon_speed = 0.03;
 var weapon_angle = 90;
@@ -88,7 +87,6 @@ function draw_boxes(ctx){
 }
 
 function draw(ctx){
-    ctx.drawImage(background_img, 0, 0, ctx.canvas.width, ctx.canvas.height);
     draw_damage_events(ctx);
     draw_boxes(ctx);
     if (!players)return;
@@ -143,7 +141,8 @@ function game_loop(){
     const canvas = document.querySelector("#game-canvas");
     const ctx = canvas.getContext('2d');
     ctx.canvas.width  = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
+    ctx.canvas.height = window.innerWidth/1536*715;
+    ctx.scale(window.innerWidth/1536,window.innerWidth/1536);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     draw(ctx);
     window.requestAnimationFrame(game_loop);
@@ -157,10 +156,9 @@ function on_button_pressed(event) {
 window.addEventListener("DOMContentLoaded", () => {
     // Initialize the UI.
     const canvas = document.querySelector("#game-canvas");
-    const websocket = new WebSocket("ws://localhost:8765/");
+    const websocket = new WebSocket("ws://192.168.1.70:8765/");
 
-    
-    background_img.src = "assets/a844fb83-ba9b-4fc2-82b3-80d9890289cf.png";
+
     hit_sprite.src = "assets/hit_animation.png";
     box_img.src = "assets/box.png";
 

@@ -41,4 +41,5 @@ class Vector():
         return self.x*b.x+self.y*b.y
     
     def proj(self,b):
-        return Vector(0,0) if self.mag()==0 else self.dot(b)/(b.mag()**2)*b
+        return Vector(0,0) if b.mag()==0 else self.dot(b)/(b.mag()**2)*b
+    

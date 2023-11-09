@@ -26,6 +26,7 @@ class Player(GameObject):
                 "team": self.team}
 
 
+
 class Box(GameObject):
     def __init__(self, position, velocity) -> None:
         super().__init__(position, velocity)
@@ -34,3 +35,18 @@ class Box(GameObject):
     def to_dict(self):
         return {"type": "box",
                 "position": {"x": self.position.x, "y": self.position.y}}
+    
+    def calculate_col_point(self, gameObject):
+        if gameObject.position.x >= self.position.x + self.collision_radius:
+            if gameObject.position.y <= self.position.y - self.collision_radius: return Vector(self.position.x + self.collision_radius, self.position.y - self.collision_radius)
+            if gameObject.position.y < self.position.y + self.collision_radius: return Vector(self.position.x + self.collision_radius, gameObject.position.y)
+            if gameObject.position.y >= self.position.y + self.collision_radius: return Vector(self.position.x + self.collision_radius, self.position.y + self.collision_radius)
+        elif gameObject.position.x <= self.position.x - self.collision_radius:
+            if gameObject.position.y <= self.position.y - self.collision_radius: return Vector(self.position.x - self.collision_radius, self.position.y - self.collision_radius)
+            if gameObject.position.y < self.position.y + self.collision_radius: return Vector(self.position.x - self.collision_radius, gameObject.position.y)
+            if gameObject.position.y >= self.position.y + self.collision_radius: return Vector(self.position.x - self.collision_radius, self.position.y + self.collision_radius)
+        else:
+            if gameObject.position.y <= self.position.y - self.collision_radius: return Vector(gameObject.position.x, self.position.y - self.collision_radius)
+            else: return Vector(gameObject.position.x, self.position.y + self.collision_radius)
+        
+

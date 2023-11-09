@@ -34,7 +34,7 @@ async def handler(websocket):
     await asyncio.gather(recieve_messages(websocket),send_messages(websocket))
 
 async def main():
-    server = await websockets.serve(handler, 'localhost', 8765)
+    server = await websockets.serve(handler, '192.168.1.70', 8765)
     await server.wait_closed()
 
 if __name__ == "__main__":
