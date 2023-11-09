@@ -1,5 +1,7 @@
+var state;
 var players;
 var boxes;
+var coins = 10000;
 var damage_events = [];
 var player_sprites={"body":{}, "head":{}, "bracelet":{}, "pendant":{}, "weapon":{}};
 var hit_sprite = new Image();
@@ -8,6 +10,12 @@ var box_img = new Image();
 var weapon_speed = 0.03;
 var weapon_angle = 90;
 var dmg_dealt;
+var prev_phase = null;
+
+var current_bet = {
+    "team":null,
+    "amount":null
+}
 
 function get_closest_player(player){
     let closest_player = null;
@@ -144,23 +152,72 @@ function game_loop(){
     ctx.canvas.height = window.innerWidth/1536*715;
     ctx.scale(window.innerWidth/1536,window.innerWidth/1536);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    draw(ctx);
+    if (state){
+        if (state.phase == "game_active"){
+            draw(ctx);
+            document.querySelector("#betting_timer").innerHTML = `Game active!`;
+            document.querySelectorAll(".bet_team").forEach((element) => element.style.display = "none");
+
+            if (state.phase == "game_active" && prev_phase == "betting"){
+                document.querySelector(".nav-control").checked = false;
+                coins-=current_bet.amount;
+            }
+            
+        }
+        if (state.phase == "betting"){
+            document.querySelectorAll(".bet_team").forEach((element) => element.style.display = "flex");
+            document.querySelector("#betting_timer").innerHTML = `Time till new game: ${30 - Math.floor((Date.now() - new Date(state.betting_start_timestamp*1000))/1000)} sec! Make your bets!`;
+            document.querySelector(".nav-control").checked = true;
+            if (prev_phase == "game_active"){
+                if (state.previous_winner == current_bet.team){
+                    coins+=current_bet.amount*2;
+                    document.querySelector("#congratulations").innerHTML = `Your won ${current_bet.amount*2} coins!`;
+                }
+                else{
+                    document.querySelector("#congratulations").innerHTML = `Your lost :( Better luck next time!`;
+                }
+                
+                current_bet = {
+                    "team":null,
+                    "amount":null}
+                    document.querySelector("#coins").innerHTML = `Your coins: ${coins - current_bet.amount}`;
+            }
+        }
+        prev_phase = state.phase;
+    } 
     window.requestAnimationFrame(game_loop);
+}
+
+function bet_button_pressed(event){
+    team = event.getAttribute("team");
+    if (document.querySelector(`#${team}_team_bet_amount`).value > coins)return;
+    current_bet.team = team;
+    current_bet.amount = document.querySelector(`#${team}_team_bet_amount`).value;
+    if (current_bet.amount){
+        document.querySelector("#your_bet").innerHTML = `Your bet: ${current_bet.team}: ${current_bet.amount} coins`;
+        document.querySelector("#your_bet").style.color = team;
+        document.querySelector("#coins").innerHTML = `Your coins: ${coins - current_bet.amount}`;
+    }
+    
+
 }
 
 function on_button_pressed(event) {
     const data = {type:"button_press",content:event.currentTarget.action};
     event.currentTarget.websocket.send(JSON.stringify(data));
+    
 }
 
 window.addEventListener("DOMContentLoaded", () => {
     // Initialize the UI.
     const canvas = document.querySelector("#game-canvas");
-    const websocket = new WebSocket("ws://192.168.1.70:8765/");
+    const websocket = new WebSocket("ws://192.168.1.67:8765/");
 
 
     hit_sprite.src = "assets/hit_animation.png";
     box_img.src = "assets/box.png";
+
+    document.querySelector("#coins").innerHTML = `Your coins: ${coins - current_bet.amount}`;
 
     websocket.addEventListener("message", ({ data }) => {
         state = JSON.parse(data);

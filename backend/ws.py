@@ -5,11 +5,13 @@ import game
 import threading
 from datetime import datetime
 
+
 def on_pause_button_pressed():
-    if game.game_active:
+    if game.phase == "game_active":
         game.pause()
     else:
         game.unpause()
+
 
 async def recieve_messages(websocket):
     async for message in websocket:
@@ -22,19 +24,21 @@ async def recieve_messages(websocket):
                     case "reset":
                         game.reset()
 
+
 async def send_messages(websocket):
     while True:
         state = game.get_state()
         message = json.dumps(state)
         await asyncio.sleep(0.01)
         await websocket.send(message)
-        
+
 
 async def handler(websocket):
-    await asyncio.gather(recieve_messages(websocket),send_messages(websocket))
+    await asyncio.gather(recieve_messages(websocket), send_messages(websocket))
+
 
 async def main():
-    server = await websockets.serve(handler, '192.168.1.70', 8765)
+    server = await websockets.serve(handler, '192.168.1.67', 8765)
     await server.wait_closed()
 
 if __name__ == "__main__":
@@ -42,5 +46,3 @@ if __name__ == "__main__":
     game_thread.daemon = True
     game_thread.start()
     asyncio.run(main())
-
-    

@@ -34,6 +34,56 @@ html, body {
   z-index: 102;
 }
 
+#betting_timer{
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 102;
+  font: 30px Arial, sans-serif;
+  color:#fff;
+}
+
+#congratulations{
+  position: absolute;
+  top: 0%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 102;
+  font: 30px Arial, sans-serif;
+  color:#fff;
+}
+
+#coins{
+  position: absolute;
+  top: 15%;
+  right: 10%;
+  z-index: 102;
+  font: 30px Arial, sans-serif;
+  color:#fff;
+}
+
+.bet_team {
+  position: relative;
+  width: 100%;
+  top: 20%;
+  z-index: 102;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#your_bet{
+  position: relative;
+  width: 100%;
+  top: 20%;
+  z-index: 102;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
 .navigation {
   background: rgba(0, 0, 0, 0.62);
   position: absolute;

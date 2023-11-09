@@ -7,7 +7,6 @@ import math
 from game_object import *
 
 prev_update_datetime = None
-game_active = False
 
 active_objects = []
 
@@ -27,9 +26,16 @@ damage_events = []
 GRAVITY = 200
 PLAYER_NUM = 10
 BOX_NUM = 20
+PLAYER_HEALTH = 10
 
 impulse_cooldown = 0
 grace_period = 3
+
+phase = "betting"
+
+betting_start_time = datetime.now()
+
+winner = None
 
 
 def remove_dead_players():
@@ -104,8 +110,9 @@ def calculate_collisions():
     global active_objects
     for i in range(len(active_objects)):
         for j in range(i+1, len(active_objects)):
-            offset = active_objects[i].collision_radius + active_objects[j].collision_radius
-            if type(active_objects[i])==Player and type(active_objects[j])==Player and \
+            offset = active_objects[i].collision_radius + \
+                active_objects[j].collision_radius
+            if type(active_objects[i]) == Player and type(active_objects[j]) == Player and \
                     (active_objects[j].position-active_objects[i].position).mag() < offset:
                 direction = (active_objects[i].position -
                              active_objects[j].position).norm()
@@ -128,13 +135,14 @@ def calculate_collisions():
                                   active_objects[j].position)/2
                         damage_events.append(
                             {"x": center.x, "y": center.y, "damage": "{:.2f}".format(damage)})
-            
-            if type(active_objects[i])==Box and type(active_objects[j]) == Box and\
-                    abs(active_objects[i].position.x - active_objects[j].position.x)<offset and\
-                    abs(active_objects[i].position.y - active_objects[j].position.y)<offset:
-                
+
+            if type(active_objects[i]) == Box and type(active_objects[j]) == Box and\
+                    abs(active_objects[i].position.x - active_objects[j].position.x) < offset and\
+                    abs(active_objects[i].position.y - active_objects[j].position.y) < offset:
+
                 if abs(active_objects[i].position.y - active_objects[j].position.y) > abs(active_objects[i].position.x - active_objects[j].position.x):
-                    collision_v = ((active_objects[i].velocity.y)+(active_objects[j].velocity.y)) * 0.5
+                    collision_v = (
+                        (active_objects[i].velocity.y)+(active_objects[j].velocity.y)) * 0.5
                     if active_objects[i].position.y < active_objects[j].position.y:
                         active_objects[i].position.y = active_objects[j].position.y - offset
                     else:
@@ -142,16 +150,17 @@ def calculate_collisions():
                     active_objects[i].velocity.y = collision_v
                     active_objects[j].velocity.y = collision_v
                 else:
-                    collision_v = ((active_objects[i].velocity.x)+(active_objects[j].velocity.x)) * 0.5
+                    collision_v = (
+                        (active_objects[i].velocity.x)+(active_objects[j].velocity.x)) * 0.5
                     if active_objects[i].position.x < active_objects[j].position.x:
                         active_objects[i].position.x = active_objects[j].position.x - offset
                     else:
                         active_objects[j].position.x = active_objects[i].position.x - offset
                     active_objects[i].velocity.x = collision_v
                     active_objects[j].velocity.x = collision_v
-                        
-            if set([type(active_objects[i]),type(active_objects[j])]) == set([Box,Player]):
-                if type(active_objects[i])==Box and type(active_objects[j])==Player:
+
+            if set([type(active_objects[i]), type(active_objects[j])]) == set([Box, Player]):
+                if type(active_objects[i]) == Box and type(active_objects[j]) == Player:
                     obj_box = active_objects[i]
                     obj_player = active_objects[j]
                 else:
@@ -159,7 +168,7 @@ def calculate_collisions():
                     obj_player = active_objects[i]
                 if (obj_box.calculate_col_point(obj_player)-obj_player.position).mag() < obj_player.collision_radius:
                     direction = (obj_box.position -
-                             obj_player.position).norm()
+                                 obj_player.position).norm()
                     collision_v = (obj_box.velocity.proj(direction).mag(
                     ) + obj_player.velocity.proj(direction).mag())*direction/2
 
@@ -167,8 +176,6 @@ def calculate_collisions():
                         direction))
                     obj_player.velocity += Vector(0, 0) - collision_v - obj_player.velocity.proj(
                         direction)
-
-
 
 
 def populate_players():
@@ -182,7 +189,7 @@ def populate_players():
                               Vector(random.randint(50, (1500//len(teams))) + (1500//len(teams)) * (team_index),
                               random.randint(50, 550)),
                               Vector(0, 0),
-                              100,
+                              PLAYER_HEALTH,
                               {"head": head, "body": head + "_body", "pendant": random.choice(apperances["pendant"]),
                               "bracelet": random.choice(apperances["bracelet"]), "weapon": random.choice(apperances["weapon"])}, team_color))
 
@@ -193,12 +200,12 @@ def spawn_boxes():
     for i in range(7):
         for j in range(2):
             active_objects.append(Box(Vector(750 + j*40, 615 - i*40),
-                                    Vector(0, 0)))
+                                      Vector(0, 0)))
 
 
 def update():
 
-    global prev_update_datetime, impulse_cooldown, grace_period, active_objects
+    global prev_update_datetime, impulse_cooldown, grace_period, active_objects, phase, winner
     td = (datetime.now() - prev_update_datetime).total_seconds()
     impulse_cooldown -= td
     if (grace_period > 0):
@@ -213,41 +220,49 @@ def update():
     apply_velocity(td)
     remove_dead_players()
     if len(set([object.team for object in active_objects if type(object) == Player])) == 1:
-        reset()
+        winner = [object.team for object in active_objects if type(
+            object) == Player][0]
+        end_game()
+        phase = "betting"
     time.sleep(1/1000)
 
 
+def end_game():
+    global phase, betting_start_time
+    phase = "betting"
+    betting_start_time = datetime.now()
+
+
 def start_game():
-    global prev_update_datetime
+    global prev_update_datetime, phase
     prev_update_datetime = datetime.now()
     reset()
     while (True):
-        if (game_active):
+        if (phase == "game_active"):
             update()
-
-
-def pause():
-    global game_active
-    game_active = False
+        elif (phase == "betting"):
+            if (datetime.now() - betting_start_time > timedelta(seconds=30)):
+                reset()
+                phase = "game_active"
 
 
 def unpause():
-    global prev_update_datetime, game_active, grace_period
+    global prev_update_datetime, grace_period, phase
     grace_period = 3
     prev_update_datetime = datetime.now()
-    game_active = True
+    phase = "game_active"
 
 
 def reset():
-    global game_active, active_objects
-    game_active = False
+    global active_objects
     active_objects = []
     populate_players()
     spawn_boxes()
 
 
 def get_state():
-    state = {"active_objects": [], "damage_events": damage_events[:]}
+    state = {"active_objects": [],
+             "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
     damage_events.clear()
     for object in active_objects:
         state["active_objects"].append(object.to_dict())
