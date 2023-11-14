@@ -4,33 +4,46 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <input type="checkbox" id="nav-control" class="nav-control">
-    <label for="nav-control" class="menu-buttons">
-    <img src="site_overlay/home_btn.jpg" alt="menu" border="1" width="100%" height="100%">
-    </label>
-    <nav class="navigation">
-        <div class="menu-buttons">
-            <img src="site_overlay/home_btn.jpg" alt="menu" border="1" width="100%" height="100%" style = "margin-top: 70px">
-            <img src="site_overlay/home_btn.jpg" alt="menu" border="1" width="100%" height="100%">
-            <img src="site_overlay/home_btn.jpg" alt="menu" border="1" width="100%" height="100%">
+    <header>
+        <div id = "coins" class="header_item">
+            <img src="assets/coin.png">
+            <p id="coins_number"></p>
         </div>
-        <p id="coins"></p>
-        <p id="congratulations">You Won!</p>
-        <p id="betting_timer"></p>
-        <div class = "bet_team" style = "color: red"><p>Red:</p><input type="text" id ="red_team_bet_amount"><button type="button" team="red" onclick="bet_button_pressed(this)">bet</button></div>
-        <div class = "bet_team" style = "color: blue"><p>Blue:</p><input type="text" id ="blue_team_bet_amount"><button type="button" team="blue" onclick="bet_button_pressed(this)">bet</button></div>
-        <div class = "bet_team" style = "color: green"><p>Green:</p><input type="text" id ="green_team_bet_amount"><button type="button" team="green" onclick="bet_button_pressed(this)">bet</button></div>
-        <div class = "bet_team" style = "color: yellow"><p>Yellow:</p><input type="text" id ="yellow_team_bet_amount"><button type="button" team="yellow" onclick="bet_button_pressed(this)">bet</button></div>
-        <p id="your_bet"></p>
-
-    </nav>
-    <div class="canvas-container">
-        <button type="button" id="start-btn" class="ontop_btn">Click Me!</button>
-        <button type="button" id="reset-btn" class="ontop_btn">reset!</button>
-
-        <canvas id="game-canvas"></canvas>
-    </div>
-
+        <div id = "socials" class="header_item">
+            <img src="assets/instagram.png">
+            <img src="assets/discord.png">
+            <img src="assets/twitter.png">
+        </div>
+    </header>
+    <main>
+        <div id = "choose_your_team_label" class="main_item"><h1>Choose your team!</h1></div>
+        <div id = "next_match_timer" class="main_item">
+            <h3>Time till next match:</h3>
+            <p>30 seconds</p>
+        </div>
+        <div id = "teams_container" class="main_item">
+            <div class="team">
+                <img src="assets/team_logos/blue.png" id="blue_team_img">
+            </div>
+            <div class="team">
+                <img src="assets/team_logos/red.png" id="red_team_img">
+            </div>
+            <div class="team">
+                <img src="assets/team_logos/yellow.png" id="yellow_team_img">
+            </div>
+            <div class="team">
+                <img src="assets/team_logos/green.png" id="green_team_img">
+            </div>
+        </div>
+        <div id = "join" class="main_item">
+            <h2>Join!</h2>
+            <p>(Not available in beta)</p>
+        </div>
+    </main>
     <script src="script.js"></script>
+    <footer>
+        <div id="beta_label">Beta version</div>
+    </footer>
+    <canvas id="game-canvas"></canvas>
 </body>
 </html> 
