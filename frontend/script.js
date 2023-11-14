@@ -149,7 +149,7 @@ function load_player_sprites(){
 function game_loop(){
     const ctx = canvas.getContext('2d');
     ctx.canvas.width  = window.innerWidth;
-    ctx.canvas.height = window.innerWidth/1536*715;
+    ctx.canvas.height = window.innerWidth/1536*703;
     ctx.scale(window.innerWidth/1536,window.innerWidth/1536);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (state){
