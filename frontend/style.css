@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Comic Sans MS';
+  src: url("assets/COMIC.ttf");
+}
+
 body,html{
   height: 99%;
   margin: 0;
@@ -58,14 +63,34 @@ p,h2,h3{
   padding-top: 5%;
   padding-bottom: 5%;
   float:left;
-  justify-content: center;
   display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.team img{
-  height: 100%; width: auto;
+.team input{
+  width: 60%;
   max-height: 25vw;
   z-index: 101;
+}
+
+.team_bet{
+  display: none;
+  margin-top: 10px;
+}
+
+.team_bet p {
+  text-align: center;
+}
+
+.bet_amount_container{
+  display: flex;
+  flex-direction: row;
+}
+
+.bet_amount_container input{
+  height: 30px; width: auto;
+  margin: 0 5px 0 5px;
 }
 
 #blue_team_img:hover{
@@ -165,3 +190,28 @@ p,h2,h3{
   background-color: #535353;
 }
 
+#current_bet_match{
+  margin-top: 10px;
+  margin-left: 10px;
+  padding-right: 10px;
+  float: left;
+  font-size: large;
+}
+
+#notification{
+  display: none;
+  position: absolute;
+  width: 30%;
+  min-width: 200px;
+  height: 50px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right:0;
+  background-color: green;
+  border: 1px solid black;
+  border-radius: 25px;
+  top: 10px;
+  font-size: large;
+}

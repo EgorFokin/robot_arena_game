@@ -69,9 +69,9 @@ function draw_damage_events(ctx){
     if (!damage_events)return;
     for (let damage_event of damage_events){
         ctx.fillStyle = 'red';
-        ctx.font = `bold ${10+Math.floor(damage_event.dmg)}px Courier New` ;
+        ctx.font = `bold ${10+Math.floor(damage_event.dmg/2)}px Courier New` ;
         ctx.textAlign = "center";
-        ctx.fillText(damage_event.dmg.toString()+(damage_event.dmg > 8 ? " Crit!" :""), damage_event.x, damage_event.y-damage_event.frame/2); 
+        ctx.fillText(damage_event.dmg.toString()+(damage_event.dmg > 15 ? " Crit!" :""), damage_event.x, damage_event.y-damage_event.frame/2); 
         damage_event.frame+=1;
         if (damage_event.frame<50){
             ctx.drawImage(hit_sprite,200*(Math.floor(damage_event.frame/20)%5),200*Math.floor(damage_event.frame/25),200,200, damage_event.x-50, damage_event.y-50,100,100)
@@ -146,8 +146,24 @@ function load_player_sprites(){
     }
 }
 
+function get_coins_from_cookie(){
+    let cookies = document.cookie.split(';');
+    for (let cookie of cookies){
+        if (cookie.split('=')[0].trim() == "coins"){
+            coins = parseInt(cookie.split('=')[1]);
+        }
+    }
+}
+
+function change_coins_in_cookie(){
+    document.cookie = `coins=${coins}; expires=Fri, 31 Dec 9999 23:59:59 GMT;SameSite=Strict;`;
+    
+}
+
 function game_loop(){
     const ctx = canvas.getContext('2d');
+    get_coins_from_cookie();
+    document.querySelector("#coins_number").innerHTML = coins;
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerWidth/1536*703;
     ctx.scale(window.innerWidth/1536,window.innerWidth/1536);
@@ -155,64 +171,78 @@ function game_loop(){
     if (state){
         if (state.phase == "game_active"){
             draw(ctx);
-            //document.querySelectorAll(".bet_team").forEach((element) => element.style.display = "none");
-
+            document.querySelector("main").style.display = "none";
             if (state.phase == "game_active" && prev_phase == "betting"){
-                document.querySelector("main").style.display = "none";
-                coins-=current_bet.amount;
+                if (current_bet.team)
+                document.querySelector("#current_bet_match").innerHTML = `Current bet: ${current_bet.amount} on <span style="color: ${current_bet.team};">${current_bet.team}</span>`;
             }
             
         }
         if (state.phase == "betting"){
-            //document.querySelectorAll(".bet_team").forEach((element) => element.style.display = "flex");
-            document.querySelector("#next_match_timer p").innerHTML = `${30 - Math.floor((Date.now() - new Date(state.betting_start_timestamp*1000))/1000)} seconds!`;
+            let timer = 30 - Math.floor((Date.now() - new Date(state.betting_start_timestamp*1000))/1000);
+            document.querySelector("#next_match_timer p").innerHTML = `${timer} seconds!`;
+
+            if (timer<=20)document.querySelector("#notification").style.display = "none";
+
             document.querySelector("main").style.display = "block";
             if (prev_phase == "game_active"){
                 if (state.previous_winner == current_bet.team){
-                    coins+=current_bet.amount*2;
-                    //document.querySelector("#congratulations").innerHTML = `Your won ${current_bet.amount*2} coins!`;
-                    //document.querySelector("#congratulations").style.color = "green";
+                    coins+=current_bet.amount*4;
+                    document.querySelector("#notification").style.display = "block";
+                    document.querySelector("#notification").style.backgroundColor = "rgba(0,255,0,0.5)";
+                    document.querySelector("#notification").innerHTML = `<span style="color: ${state.previous_winner};">${state.previous_winner}</span> team won! You won ${current_bet.amount*3} coins!`;
                 }
                 else{
-                    //document.querySelector("#congratulations").innerHTML = `Your lost :( Better luck next time!`;
-                    //document.querySelector("#congratulations").style.color = "red";
+                    if (current_bet.team)coins-=current_bet.amount;
+                    document.querySelector("#notification").style.display = "block";
+                    document.querySelector("#notification").style.backgroundColor = (current_bet.amount!=null?"rgba(255,0,0,0.5)":"rgba(150,150,150,0.5)");
+                    document.querySelector("#notification").innerHTML = `<span style="color: ${state.previous_winner};">${state.previous_winner}</span> team won!`+ (current_bet.amount!=null?` You lost ${current_bet.amount} coins!`:"");
+                    if (coins<=0){
+                        document.querySelector("#notification").innerHTML = `<span style="color: ${state.previous_winner};">${state.previous_winner}</span> team won! You have lost all of your coins! But you found 500 coins on the street!`;
+                        coins = 500;
+                    }
                 }
                 
                 current_bet = {
                     "team":null,
                     "amount":null}
-                    if (current_bet.amount){
-                        //document.querySelector("#your_bet").innerHTML = `Your bet: ${current_bet.team}: ${current_bet.amount} coins`;
-                        //document.querySelector("#your_bet").style.color = current_bet.team;
-                    }
-                    //else document.querySelector("#your_bet").innerHTML = "";
-                    document.querySelector("#coins_number").innerHTML = coins - current_bet.amount;
+                
+                document.querySelector("#current_bet_match").innerHTML = "";
+                document.querySelectorAll(".team_bet").forEach((element) => element.style.display = "none");
             }
         }
         prev_phase = state.phase;
     } 
+    change_coins_in_cookie();
     window.requestAnimationFrame(game_loop);
 }
 
 function bet_button_pressed(event){
-    team = event.getAttribute("team");
-    if (document.querySelector(`#${team}_team_bet_amount`).value > coins)return;
-    current_bet.team = team;
-    current_bet.amount = document.querySelector(`#${team}_team_bet_amount`).value;
-    if (current_bet.amount){
-        document.querySelector("#your_bet").innerHTML = `Your bet: ${current_bet.team}: ${current_bet.amount} coins`;
-        document.querySelector("#your_bet").style.color = current_bet.team;
-        document.querySelector("#coins").innerHTML = `Your coins: ${coins - current_bet.amount}`;
-    }
-    else document.querySelector("#your_bet").innerHTML = "";
-    
+    team = event.getAttribute("id").split('_')[0];
+    if (current_bet.team == team || coins==0)return;
 
+    current_bet.amount = Math.min(1000,coins);
+    current_bet.team = team;
+
+    document.querySelectorAll(".team_bet").forEach((element) => element.style.display = "none");
+    document.querySelector(`#${team}_team_bet`).style.display = "block";
+    document.querySelector(`#${current_bet.team}_team_bet_amount`).innerHTML = `${current_bet.amount} coins`;
 }
 
-function on_button_pressed(event) {
-    const data = {type:"button_press",content:event.currentTarget.action};
-    event.currentTarget.websocket.send(JSON.stringify(data));
-    
+function increase_bet(){
+    if (current_bet.amount*2>coins)return;
+    current_bet.amount*=2;
+    document.querySelector(`#${current_bet.team}_team_bet_amount`).innerHTML = `${current_bet.amount} coins`;
+}
+
+function decrease_bet(){
+    current_bet.amount/=2;
+    if (current_bet.amount<Math.min(1000,coins)){
+        document.querySelector(`#${current_bet.team}_team_bet`).style.display = "none";
+        current_bet.team = null;
+        
+    }
+    document.querySelector(`#${current_bet.team}_team_bet_amount`).innerHTML = `${current_bet.amount} coins`;
 }
 
 window.addEventListener("DOMContentLoaded", () => {

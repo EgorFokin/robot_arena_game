@@ -16,7 +16,7 @@ apperances = {
     "pendant": ["Dollar sign", "Golden Chain", "Golden Sol", "Silver Lock"],
     "weapon": ["Baseball Bat", "Claws", "Katana", "Knife", "Knuckles", "Nunchaku", "Sai", "Sword"]}
 
-team_count = 2
+team_count = 4
 teams = ["red", "blue", "green", "yellow"]
 teams = teams[:team_count]
 
@@ -26,8 +26,8 @@ damage_events = []
 GRAVITY = 200
 PLAYER_NUM = 10
 BOX_NUM = 20
-DAMAGE_LOW = 1
-DAMAGE_HIGH = 10
+DAMAGE_LOW = 2
+DAMAGE_HIGH = 20
 
 impulse_cooldown = 0
 grace_period = 3
@@ -103,7 +103,8 @@ def apply_random_impulses():
         target = random.choice(players)
         while target.team == player.team:
             target = random.choice(players)
-        player.velocity += (target.position-player.position)*0.7
+        player.velocity += (target.position-player.position) * \
+            0.7 + Vector(0, -100)
 
 
 def calculate_collisions():
@@ -183,7 +184,7 @@ def populate_players():
     # populates the players list with random players
     global active_objects
     for i in range(PLAYER_NUM):
-        team_index = random.randint(0, len(teams)-1)
+        team_index = i % team_count
         team_color = teams[team_index]
         head = random.choice(apperances["head"])
         active_objects.append(Player("player"+str(i),
@@ -198,10 +199,33 @@ def populate_players():
 def spawn_boxes():
     # spawns boxes at random locations
     global active_objects
-    for i in range(7):
-        for j in range(2):
-            active_objects.append(Box(Vector(750 + j*40, 615 - i*40),
-                                      Vector(0, 0)))
+    spawn_type = random.randint(1, 3)
+    match spawn_type:
+        case 1:
+            for i in range(7):
+                for j in range(2):
+                    active_objects.append(Box(Vector(750 + j*40, 595 - i*40),
+                                              Vector(0, 0)))
+        case 2:
+            for i in range(3):
+                for j in range(3-i):
+                    active_objects.append(Box(Vector(300 + j*40+i*20, 595 - i*40),
+                                              Vector(0, 0)))
+
+            for i in range(3):
+                for j in range(3-i):
+                    active_objects.append(Box(Vector(1200 + j*40+i*20, 595 - i*40),
+                                              Vector(0, 0)))
+        case 3:
+            for i in range(3):
+                for j in range(3-i):
+                    active_objects.append(Box(Vector(20 + j*40, 595 - i*40),
+                                              Vector(0, 0)))
+
+            for i in range(3):
+                for j in range(3-i):
+                    active_objects.append(Box(Vector(1480 - j*40, 595 - i*40),
+                                              Vector(0, 0)))
 
 
 def update():

@@ -9,6 +9,7 @@
             <img src="assets/coin.png">
             <p id="coins_number"></p>
         </div>
+        <p id = "current_bet_match"></p>
         <div id = "socials" class="header_item">
             <img src="assets/instagram.png">
             <img src="assets/discord.png">
@@ -23,16 +24,53 @@
         </div>
         <div id = "teams_container" class="main_item">
             <div class="team">
-                <img src="assets/team_logos/blue.png" id="blue_team_img">
+                <input type="image" src="assets/team_logos/blue.png" id="blue_team_img" onclick="bet_button_pressed(this)">
+                <div class="team_bet" id = "blue_team_bet">
+                    <p>Your bet:</p>
+                    <div class="bet_amount_container">
+                        <input type="image" src="assets/up.png" onclick="increase_bet()">
+                        <p  id = "blue_team_bet_amount">1000</p>
+                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
+                    </div>
+                    
+                </div>
             </div>
             <div class="team">
-                <img src="assets/team_logos/red.png" id="red_team_img">
+                <input type="image" src="assets/team_logos/red.png" id="red_team_img" onclick="bet_button_pressed(this)">
+                <div class="team_bet" id = "red_team_bet">
+                    <p>Your bet:</p>
+                    <div class="bet_amount_container">
+                        <input type="image" src="assets/up.png" onclick="increase_bet()">
+                        <p  id = "red_team_bet_amount">1000</p>
+                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
+                    </div>
+                    
+                </div>
+                
             </div>
             <div class="team">
-                <img src="assets/team_logos/yellow.png" id="yellow_team_img">
+                <input type="image" src="assets/team_logos/yellow.png" id="yellow_team_img" onclick="bet_button_pressed(this)">
+                <div class="team_bet" id = "yellow_team_bet">
+                    <p>Your bet:</p>
+                    <div class="bet_amount_container">
+                        <input type="image" src="assets/up.png" onclick="increase_bet()">
+                        <p  id = "yellow_team_bet_amount">1000</p>
+                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
+                    </div>
+                    
+                </div>
             </div>
             <div class="team">
-                <img src="assets/team_logos/green.png" id="green_team_img">
+                <input type="image" src="assets/team_logos/green.png" id="green_team_img" onclick="bet_button_pressed(this)">
+                <div class="team_bet" id = "green_team_bet">
+                    <p>Your bet:</p>
+                    <div class="bet_amount_container">
+                        <input type="image" src="assets/up.png" onclick="increase_bet()">
+                        <p  id = "green_team_bet_amount">1000</p>
+                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
+                    </div>
+                    
+                </div>
             </div>
         </div>
         <div id = "join" class="main_item">
@@ -44,6 +82,7 @@
     <footer>
         <div id="beta_label">Beta version</div>
     </footer>
+    <div id = "notification">You've lost (</div>
     <canvas id="game-canvas"></canvas>
 </body>
 </html> 
