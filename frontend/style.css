@@ -11,7 +11,7 @@ body,html{
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
-  z-index: 50;
+  z-index: -1;
   color: white;
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 
@@ -19,11 +19,15 @@ body,html{
 }
 
 header{
+  position:relative;
   width: 100%;
   height: 50px;
+  z-index: 100;
 }
 
 main{
+  position: relative;
+  z-index: 100;
   height: calc(100% - 70px);
   width:100%;
 }
@@ -33,6 +37,7 @@ footer{
   bottom: 0px;
   height: 20px;
   width: 100%;
+  z-index: 100;
 }
 
 canvas{
@@ -40,7 +45,7 @@ canvas{
   height: 100%;
   width:100%;
   top: 0;
-  z-index: 50;
+  z-index: 0;
   pointer-events: none; 
 }
 
@@ -53,63 +58,111 @@ p,h2,h3{
   display: block;
 }
 
-.main_item{
-  justify-content: center;
-  display: flex;
-}
 
-.team{
-  width:25%;
-  padding-top: 5%;
-  padding-bottom: 5%;
+#bets_menu{
+  font-size: 20px;
+  width:20%;
+  height: 80%;
+  margin: 20px 20px 20px 100px;
+  border-radius: 20px;
+  border: 1px solid #000000;
   float:left;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background-color: rgba(255,255,255,0.1);
+  table{
+    border-spacing: 10px 20px;
+    td{
+      width: 50%;
+    }
+  }
 }
 
-.team input{
-  width: 60%;
-  max-height: 25vw;
+#teams_container{
+  width:60%;
+  height:80%;
+  margin-right:100px;
+  float:right;
+}
+
+#teams{
+  height: 90%;
+  display:grid;
+  justify-content: center;
+  
+  margin-top: 20px;
+  grid-template-columns: 40% 40%;
+  grid-column-gap: 80px;
+  grid-row-gap: 40px;
+  
+
+  .team{
+    border: 1px solid #000000;
+    border-radius: 20px;
+    justify-content: center;
+    flex-direction: row;
+    display: flex;
+
+    .player{
+      margin: 20px;
+      height: 130px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+}
+
+.player img{
+  height: 100px;
+  width: auto;
+  /* margin: 5px; */
+  position: relative;
+
+}
+
+.player p{
+  position: relative;
+  top:-150px;
+}
+
+.body{
+  top:150px;
+  z-index: 100;
+}
+
+.bracelet{
+  top:-50px;
   z-index: 101;
 }
 
-.team_bet{
-  display: none;
-  margin-top: 10px;
+.head{
+  top:50px;
+  z-index: 101;
+} 
+
+.pendant{
+  top:-150px;
+  z-index: 101;
 }
 
-.team_bet p {
-  text-align: center;
+
+#join_button{
+  display: block;
+  border: 1px solid #000000;
+  background-color: #ffae00;
+  border-radius: 20px;
+  width: 150px;
+  height: 60px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  color: white;
+  font-size: 30px;
 }
 
-.bet_amount_container{
-  display: flex;
-  flex-direction: row;
-}
-
-.bet_amount_container input{
-  height: 30px; width: auto;
-  margin: 0 5px 0 5px;
-}
-
-#blue_team_img:hover{
-  box-shadow: 0 5px 15px blue;
-  cursor: pointer;
-}
-
-#red_team_img:hover{
-  box-shadow: 0 5px 15px red;
-  cursor: pointer;
-}
-
-#yellow_team_img:hover{
-  box-shadow: 0 5px 15px yellow;
-  cursor: pointer;
-}
-
-#green_team_img:hover{
-  box-shadow: 0 5px 15px green;
+#join_button:hover{
   cursor: pointer;
 }
 
@@ -146,48 +199,18 @@ p,h2,h3{
   margin: 0 5px 0 5px;
 }
 
+#next_match_timer{
+  float:right;
+  margin: 20px;
+  margin-right: 20%;
+  font-size: 20px;
+}
+
 #beta_label{
   float: right ;
   font-family: "Unifont";
   color: white;
   margin-right: 10px;
-}
-
-#choose_your_team_label{
-  height:10%;
-}
-
-#next_match_timer{
-  height:10%;
-  flex-direction: column;
-  text-align: center;
-}
-
-#teams_container{
-  height:60%;
-  padding-left:10%;
-  padding-right:10%;
-}
-
-#join{
-  height:20%;
-}
-
-#join{
-  background-color: #707070;
-  border: 1px solid black;
-  max-height: 75px;
-  border-radius: 25px;
-  max-width: 150px;
-  margin:auto;
-  flex-direction: column;
-  text-align: center;
-  z-index: 101;
-  color:#ababab;
-}
-
-#join:hover{
-  background-color: #535353;
 }
 
 #current_bet_match{
@@ -214,4 +237,117 @@ p,h2,h3{
   border-radius: 25px;
   top: 10px;
   font-size: large;
+  z-index: 1000;
+}
+
+#darken{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top:0;
+  background-color: black;
+  opacity: 0.5;
+  z-index: 1;
+}
+#bets{
+  height: 70%;
+  width: 100%;
+  text-align: center;
+
+  .coeff{
+    border: 1px solid #000000;
+    user-select: none;
+  }
+
+  .coeff:hover{
+    cursor: pointer;
+  }
+}
+
+#bets_upper_menu{
+  height: 30%;
+  display: flex;
+  flex-direction: row;
+}
+
+#currency_selector{
+  width:50%;
+  margin-top: 20px;
+}
+#cur_bet_container{
+  width:50%;
+  margin-top: 20px;
+  text-align: center ;
+}
+
+#currency_selected{
+  display: flex;
+  flex-direction: row;
+  height: 30%;
+
+  img{
+    height: 30px;
+    width:auto;
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+
+} 
+
+#selector{
+  display: flex;
+  flex-direction: column;
+  height: 70%;
+
+  input{
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+
+  #selector_buttons{
+    display: flex;
+    flex-direction: row;
+    height: 40%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    button{
+      width:40%;
+      margin-left: 5%;
+      margin-right: 5%;
+      
+      border-radius: 0;
+      border: 1px solid #000000;
+      background-color: rgba(0, 0, 0, 0.3);
+
+      color: white;
+      font-size: 20px;
+      font-family: "Comic Sans MS", "Comic Sans", cursive;
+      text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    }
+  }
+}
+
+
+#cur_bet{
+  font-size: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  #circle{
+    display: none;
+    margin-top: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    background-color: blue;
+  }
+  input{
+    margin-top: 10px;
+    height:15px;
+    width: auto;
+  }
+  p{
+    margin-left: 10px;
+    margin-right: 5px;
+  }
 }

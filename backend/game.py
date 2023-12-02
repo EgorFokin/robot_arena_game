@@ -24,7 +24,7 @@ damage_events = []
 
 
 GRAVITY = 200
-PLAYER_NUM = 10
+PLAYER_NUM = 12
 BOX_NUM = 20
 DAMAGE_LOW = 2
 DAMAGE_HIGH = 20
@@ -200,32 +200,31 @@ def spawn_boxes():
     # spawns boxes at random locations
     global active_objects
     spawn_type = random.randint(1, 3)
-    match spawn_type:
-        case 1:
-            for i in range(7):
-                for j in range(2):
-                    active_objects.append(Box(Vector(750 + j*40, 595 - i*40),
-                                              Vector(0, 0)))
-        case 2:
-            for i in range(3):
-                for j in range(3-i):
-                    active_objects.append(Box(Vector(300 + j*40+i*20, 595 - i*40),
-                                              Vector(0, 0)))
+    if spawn_type == 1:
+        for i in range(7):
+            for j in range(2):
+                active_objects.append(Box(Vector(750 + j*40, 595 - i*40),
+                                          Vector(0, 0)))
+    elif spawn_type == 2:
+        for i in range(3):
+            for j in range(3-i):
+                active_objects.append(Box(Vector(300 + j*40+i*20, 595 - i*40),
+                                          Vector(0, 0)))
 
-            for i in range(3):
-                for j in range(3-i):
-                    active_objects.append(Box(Vector(1200 + j*40+i*20, 595 - i*40),
-                                              Vector(0, 0)))
-        case 3:
-            for i in range(3):
-                for j in range(3-i):
-                    active_objects.append(Box(Vector(20 + j*40, 595 - i*40),
-                                              Vector(0, 0)))
+        for i in range(3):
+            for j in range(3-i):
+                active_objects.append(Box(Vector(1200 + j*40+i*20, 595 - i*40),
+                                          Vector(0, 0)))
+    elif spawn_type == 3:
+        for i in range(3):
+            for j in range(3-i):
+                active_objects.append(Box(Vector(20 + j*40, 595 - i*40),
+                                          Vector(0, 0)))
 
-            for i in range(3):
-                for j in range(3-i):
-                    active_objects.append(Box(Vector(1480 - j*40, 595 - i*40),
-                                              Vector(0, 0)))
+        for i in range(3):
+            for j in range(3-i):
+                active_objects.append(Box(Vector(1480 - j*40, 595 - i*40),
+                                          Vector(0, 0)))
 
 
 def update():
@@ -266,8 +265,8 @@ def start_game():
         if (phase == "game_active"):
             update()
         elif (phase == "betting"):
+            reset()
             if (datetime.now() - betting_start_time > timedelta(seconds=30)):
-                reset()
                 phase = "game_active"
 
 

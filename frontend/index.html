@@ -15,74 +15,76 @@
             <img src="assets/discord.png">
             <img src="assets/twitter.png">
         </div>
+        <p id ="next_match_timer">time until next match: 30sec</p>
     </header>
     <main>
-        <div id = "choose_your_team_label" class="main_item"><h1>Choose your team!</h1></div>
-        <div id = "next_match_timer" class="main_item">
-            <h3>Time till next match:</h3>
-            <p>30 seconds</p>
+        <div id ="bets_menu">
+            <div id = "bets_upper_menu">
+                <div id = "currency_selector">
+                    <div id="currency_selected"><img src="assets/tap.png"><p>2500</p></div>
+                    <div id = "selector">
+                        <div id = selector_buttons>
+                            <button type="button" onclick="select_1_4()">1/4</button>
+                            <button type="button" onclick="select_1_2()">1/2</button>
+                        </div>
+                        <input type="range" min="0" max="100" value="0" onchange="select_custom(value)">
+                    </div>
+                </div>
+                <div id="cur_bet_container">
+                    <p>Current bet:</p>
+                    <div id ="cur_bet">
+                        <div id ="circle"></div>
+                        <p>0</p>
+                        <input type="image" src="assets/close.png" onclick="cancel_bet()">
+                    </div>
+                </div>
+            </div>
+            
+            <table id="bets">
+                <tr>
+                    <td>Teams:</td>
+                    <td>Total bets:</td>
+                </tr>
+                <tr>
+                    <td class="coeff" style="border-color: red;" team = "red" onclick="bet_on_team(this)">x3.75</td>
+                    <td>10000</td>
+                </tr>
+                <tr>
+                    <td class="coeff" style="border-color: blue;" team = "blue" onclick="bet_on_team(this)">x3.75</td>
+                    <td>10000</td>
+                </tr>
+                <tr>
+                    <td class="coeff" style="border-color: green;" team = "green" onclick="bet_on_team(this)">x3.75</td>
+                    <td>10000</td>
+                </tr>
+                <tr>
+                    <td class="coeff" style="border-color: yellow;" team = "yellow" onclick="bet_on_team(this)">x3.75</td>
+                    <td>10000</td>
+                </tr>
+            </table>
         </div>
-        <div id = "teams_container" class="main_item">
-            <div class="team">
-                <input type="image" src="assets/team_logos/blue.png" id="blue_team_img" onclick="bet_button_pressed(this)">
-                <div class="team_bet" id = "blue_team_bet">
-                    <p>Your bet:</p>
-                    <div class="bet_amount_container">
-                        <input type="image" src="assets/up.png" onclick="increase_bet()">
-                        <p  id = "blue_team_bet_amount">1000</p>
-                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
-                    </div>
-                    
-                </div>
+        <div id = "teams_container">
+        <div id ="teams">
+            <div class = "team" team = "red" style="background-color: rgba(255, 0, 0, 0.1)">
             </div>
-            <div class="team">
-                <input type="image" src="assets/team_logos/red.png" id="red_team_img" onclick="bet_button_pressed(this)">
-                <div class="team_bet" id = "red_team_bet">
-                    <p>Your bet:</p>
-                    <div class="bet_amount_container">
-                        <input type="image" src="assets/up.png" onclick="increase_bet()">
-                        <p  id = "red_team_bet_amount">1000</p>
-                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
-                    </div>
-                    
-                </div>
-                
+            <div class = "team" team = "green" style="background-color: rgba(0, 255, 51, 0.1)">
             </div>
-            <div class="team">
-                <input type="image" src="assets/team_logos/yellow.png" id="yellow_team_img" onclick="bet_button_pressed(this)">
-                <div class="team_bet" id = "yellow_team_bet">
-                    <p>Your bet:</p>
-                    <div class="bet_amount_container">
-                        <input type="image" src="assets/up.png" onclick="increase_bet()">
-                        <p  id = "yellow_team_bet_amount">1000</p>
-                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
-                    </div>
-                    
-                </div>
+            <div class = "team" team = "blue" style="background-color: rgba(0, 21, 255, 0.1)">
             </div>
-            <div class="team">
-                <input type="image" src="assets/team_logos/green.png" id="green_team_img" onclick="bet_button_pressed(this)">
-                <div class="team_bet" id = "green_team_bet">
-                    <p>Your bet:</p>
-                    <div class="bet_amount_container">
-                        <input type="image" src="assets/up.png" onclick="increase_bet()">
-                        <p  id = "green_team_bet_amount">1000</p>
-                        <input type="image" src="assets/down.png" onclick="decrease_bet()">
-                    </div>
-                    
-                </div>
+            <div class = "team" team = "yellow" style="background-color: rgba(255, 238, 0, 0.1)">
             </div>
         </div>
-        <div id = "join" class="main_item">
-            <h2>Join!</h2>
-            <p>(Not available in beta)</p>
-        </div>
+        <button type="button" id= "join_button">join!</button>
+    </div>
+
     </main>
     <script src="script.js"></script>
     <footer>
         <div id="beta_label">Beta version</div>
     </footer>
     <div id = "notification">You've lost (</div>
+    <div id="darken"></div>
     <canvas id="game-canvas"></canvas>
+    
 </body>
 </html> 

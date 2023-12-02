@@ -12,6 +12,9 @@ var weapon_angle = 90;
 var dmg_dealt;
 var prev_phase = null;
 var canvas = null;
+var menu_players_drawn = false;
+
+var currently_selected = 0;
 
 var current_bet = {
     "team":null,
@@ -157,7 +160,47 @@ function get_coins_from_cookie(){
 
 function change_coins_in_cookie(){
     document.cookie = `coins=${coins}; expires=Fri, 31 Dec 9999 23:59:59 GMT;SameSite=Strict;`;
-    
+}
+
+function bet_on_team(element){
+    if (currently_selected==0)return;
+    current_bet.team = element.getAttribute("team");
+    document.querySelectorAll(".coeff").forEach((element) => element.style.backgroundColor = "transparent");
+    document.querySelector("#circle").style.display = "block";
+    document.querySelector("#circle").style.backgroundColor = current_bet.team;
+    element.style.backgroundColor = current_bet.team;
+
+    current_bet.amount = currently_selected;
+    document.querySelector("#cur_bet p").innerHTML = current_bet.amount;
+
+    currently_selected = 0;
+    document.querySelector("#currency_selected p").innerHTML = 0;
+    document.querySelector("#selector input").value = 0;
+}
+
+function cancel_bet(){
+    current_bet.team = null;
+    current_bet.amount = null;
+    document.querySelector("#cur_bet p").innerHTML = 0;
+    document.querySelectorAll(".coeff").forEach((element) => element.style.backgroundColor = "transparent");
+}
+
+function select_1_4(){
+    currently_selected = Math.floor(coins/4);
+    document.querySelector("#currency_selected p").innerHTML = currently_selected;
+    document.querySelector("#selector input").value = 25;
+}
+
+function select_1_2(){
+    currently_selected = Math.floor(coins/2);
+    document.querySelector("#currency_selected p").innerHTML = currently_selected;
+    document.querySelector("#selector input").value = 50;
+}
+
+function select_custom(value){
+    currently_selected = Math.floor(value/100*coins);
+    document.querySelector("#currency_selected p").innerHTML = currently_selected;
+
 }
 
 function game_loop(){
@@ -169,10 +212,14 @@ function game_loop(){
     ctx.scale(window.innerWidth/1536,window.innerWidth/1536);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (state){
+
         if (state.phase == "game_active"){
             draw(ctx);
             document.querySelector("main").style.display = "none";
+            document.querySelector("#darken").style.display = "none";
+            document.querySelector("#next_match_timer").style.display = "none";
             if (state.phase == "game_active" && prev_phase == "betting"){
+                
                 if (current_bet.team)
                 document.querySelector("#current_bet_match").innerHTML = `Current bet: ${current_bet.amount} on <span style="color: ${current_bet.team};">${current_bet.team}</span>`;
             }
@@ -180,12 +227,17 @@ function game_loop(){
         }
         if (state.phase == "betting"){
             let timer = 30 - Math.floor((Date.now() - new Date(state.betting_start_timestamp*1000))/1000);
-            document.querySelector("#next_match_timer p").innerHTML = `${timer} seconds!`;
+            
+            document.querySelector("#next_match_timer").innerHTML = `time until next match: ${timer} seconds!`;
 
             if (timer<=20)document.querySelector("#notification").style.display = "none";
 
             document.querySelector("main").style.display = "block";
+            document.querySelector("#darken").style.display = "block";
+            document.querySelector("#next_match_timer").style.display = "block";
             if (prev_phase == "game_active"){
+                menu_players_drawn = false;
+                
                 if (state.previous_winner == current_bet.team){
                     coins+=current_bet.amount*4;
                     document.querySelector("#notification").style.display = "block";
@@ -203,12 +255,15 @@ function game_loop(){
                     }
                 }
                 
-                current_bet = {
-                    "team":null,
-                    "amount":null}
+                current_bet.team = null;
+                current_bet.amount = null;
+                document.querySelector("#cur_bet p").innerHTML = 0;
+                document.querySelectorAll(".coeff").forEach((element) => element.style.backgroundColor = "transparent");
+                currently_selected = 0;
+                document.querySelector("#currency_selected p").innerHTML = currently_selected;
+                document.querySelector("#selector input").value = 0;
                 
                 document.querySelector("#current_bet_match").innerHTML = "";
-                document.querySelectorAll(".team_bet").forEach((element) => element.style.display = "none");
             }
         }
         prev_phase = state.phase;
@@ -217,38 +272,44 @@ function game_loop(){
     window.requestAnimationFrame(game_loop);
 }
 
-function bet_button_pressed(event){
-    team = event.getAttribute("id").split('_')[0];
-    if (current_bet.team == team || coins==0)return;
 
-    current_bet.amount = Math.min(1000,coins);
-    current_bet.team = team;
+function draw_menu_players(){
 
-    document.querySelectorAll(".team_bet").forEach((element) => element.style.display = "none");
-    document.querySelector(`#${team}_team_bet`).style.display = "block";
-    document.querySelector(`#${current_bet.team}_team_bet_amount`).innerHTML = `${current_bet.amount} coins`;
-}
-
-function increase_bet(){
-    if (current_bet.amount*2>coins)return;
-    current_bet.amount*=2;
-    document.querySelector(`#${current_bet.team}_team_bet_amount`).innerHTML = `${current_bet.amount} coins`;
-}
-
-function decrease_bet(){
-    current_bet.amount/=2;
-    if (current_bet.amount<Math.min(1000,coins)){
-        document.querySelector(`#${current_bet.team}_team_bet`).style.display = "none";
-        current_bet.team = null;
-        
+    for (let team of document.querySelectorAll(".team")){
+        while (team.firstChild){
+            team.removeChild(team.firstChild);
+        }
     }
-    document.querySelector(`#${current_bet.team}_team_bet_amount`).innerHTML = `${current_bet.amount} coins`;
+
+    for (let player of players){
+        
+        let player_div = document.createElement("div");
+        player_div.classList.add("player");
+        let player_body = document.createElement("img"),player_head = document.createElement("img"),player_bracelet = document.createElement("img"),player_pendant = document.createElement("img");
+        player_body.src = player_sprites.body[player.appearance.body].src;
+        player_body.classList.add("body");
+        player_head.src = player_sprites.head[player.appearance.head].src;
+        player_head.classList.add("head");
+        player_bracelet.src = player_sprites.bracelet[player.appearance.bracelet].src;
+        player_bracelet.classList.add("bracelet");
+        player_pendant.src = player_sprites.pendant[player.appearance.pendant].src;
+        player_pendant.classList.add("pendant");
+        player_div.appendChild(player_body);
+        player_div.appendChild(player_head);
+        player_div.appendChild(player_bracelet);
+        player_div.appendChild(player_pendant);
+        let player_name = document.createElement("p");
+        player_name.innerHTML = player.name;
+        player_div.appendChild(player_name);
+        document.querySelector(`.team[team=${player.team}]`).appendChild(player_div);
+        menu_players_drawn = true;
+    }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
     // Initialize the UI.
     canvas = document.querySelector("#game-canvas");
-    const websocket = new WebSocket("ws://192.168.1.67:8765/");
+    const websocket = new WebSocket("ws://34.125.43.84:3389/");
 
 
     hit_sprite.src = "assets/hit_animation.png";
@@ -269,7 +330,9 @@ window.addEventListener("DOMContentLoaded", () => {
             
         }
         load_player_sprites();
+        if (players.length==12 && !menu_players_drawn)draw_menu_players();
       });
+
 
       game_loop();
   });
