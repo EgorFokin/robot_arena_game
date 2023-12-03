@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Comic Sans MS';
-  src: url("assets/COMIC.ttf");
+  src: url("assets/COMIC.TTF");
 }
 
 body,html{
@@ -68,13 +68,17 @@ p,h2,h3{
   border: 1px solid #000000;
   float:left;
   background-color: rgba(255,255,255,0.1);
-  table{
-    border-spacing: 10px 20px;
-    td{
-      width: 50%;
-    }
-  }
 }
+
+#bets_menu table{
+  border-spacing: 10px 20px;
+
+}
+
+#bets_menu td{
+  width: 50%;
+}
+
 
 #teams_container{
   width:60%;
@@ -94,23 +98,28 @@ p,h2,h3{
   grid-row-gap: 40px;
   
 
-  .team{
-    border: 1px solid #000000;
-    border-radius: 20px;
-    justify-content: center;
-    flex-direction: row;
-    display: flex;
-
-    .player{
-      margin: 20px;
-      height: 130px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      text-align: center;
-    }
-  }
+  
 }
+
+.team{
+  border: 1px solid #000000;
+  border-radius: 20px;
+  justify-content: center;
+  flex-direction: row;
+  display: flex;
+
+  
+}
+
+.player{
+  margin: 20px;
+  height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
 
 .player img{
   height: 100px;
@@ -253,15 +262,15 @@ p,h2,h3{
   height: 70%;
   width: 100%;
   text-align: center;
+}
 
-  .coeff{
-    border: 1px solid #000000;
-    user-select: none;
-  }
+.coeff{
+  border: 1px solid #000000;
+  user-select: none;
+}
 
-  .coeff:hover{
-    cursor: pointer;
-  }
+#bets .coeff:hover{
+  cursor: pointer;
 }
 
 #bets_upper_menu{
@@ -284,47 +293,48 @@ p,h2,h3{
   display: flex;
   flex-direction: row;
   height: 30%;
-
-  img{
-    height: 30px;
-    width:auto;
-    margin-right: 10px;
-    margin-left: 10px;
-  }
-
 } 
+
+#currency_selected img{
+  height: 30px;
+  width:auto;
+  margin-right: 10px;
+  margin-left: 10px;
+}
 
 #selector{
   display: flex;
   flex-direction: column;
   height: 70%;
+}
 
-  input{
-    margin-left: 5%;
-    margin-right: 5%;
-  }
+#selector input{
+  margin-left: 5%;
+  margin-right: 5%;
+}
 
-  #selector_buttons{
-    display: flex;
-    flex-direction: row;
-    height: 40%;
-    margin-top: 5%;
-    margin-bottom: 5%;
-    button{
-      width:40%;
-      margin-left: 5%;
-      margin-right: 5%;
-      
-      border-radius: 0;
-      border: 1px solid #000000;
-      background-color: rgba(0, 0, 0, 0.3);
+#selector_buttons{
+  display: flex;
+  flex-direction: row;
+  height: 40%;
+  margin-top: 5%;
+  margin-bottom: 5%;
+  
+}
 
-      color: white;
-      font-size: 20px;
-      font-family: "Comic Sans MS", "Comic Sans", cursive;
-      text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-    }
-  }
+#selector_buttons button{
+  width:40%;
+  margin-left: 5%;
+  margin-right: 5%;
+  
+  border-radius: 0;
+  border: 1px solid #000000;
+  background-color: rgba(0, 0, 0, 0.3);
+
+  color: white;
+  font-size: 20px;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
 
@@ -333,21 +343,22 @@ p,h2,h3{
   display: flex;
   flex-direction: row;
   justify-content: center;
-  #circle{
-    display: none;
-    margin-top: 10px;
-    width: 20px;
-    height: 20px;
-    border-radius: 20px;
-    background-color: blue;
-  }
-  input{
-    margin-top: 10px;
-    height:15px;
-    width: auto;
-  }
-  p{
-    margin-left: 10px;
-    margin-right: 5px;
-  }
+}
+
+#circle{
+  display: none;
+  margin-top: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  background-color: blue;
+}
+#cur_bet input{
+  margin-top: 10px;
+  height:15px;
+  width: auto;
+}
+#cur_bet p{
+  margin-left: 10px;
+  margin-right: 5px;
 }

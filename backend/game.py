@@ -38,6 +38,11 @@ betting_start_time = datetime.now()
 
 winner = None
 
+cur_frame = 0  # mod 1e9
+
+state = {"cur_frame": cur_frame, "active_objects": [],
+         "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
+
 
 def remove_dead_players():
     # removes players with health <=0 from the players list
@@ -248,7 +253,7 @@ def update():
             object) == Player][0]
         end_game()
         phase = "betting"
-    time.sleep(1/1000)
+    time.sleep(0.01)
 
 
 def end_game():
@@ -258,14 +263,26 @@ def end_game():
 
 
 def start_game():
-    global prev_update_datetime, phase
+    global prev_update_datetime, phase, state, cur_frame
     prev_update_datetime = datetime.now()
     reset()
     while (True):
         if (phase == "game_active"):
             update()
+            cur_frame += 1
+            cur_frame %= 1e9
+            state = {"cur_frame": cur_frame, "active_objects": [],
+                     "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
+            damage_events.clear()
+            for object in active_objects:
+                state["active_objects"].append(object.to_dict())
         elif (phase == "betting"):
             reset()
+            state = {"cur_frame": cur_frame, "active_objects": [],
+                     "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
+            damage_events.clear()
+            for object in active_objects:
+                state["active_objects"].append(object.to_dict())
             if (datetime.now() - betting_start_time > timedelta(seconds=30)):
                 phase = "game_active"
 
@@ -276,12 +293,3 @@ def reset():
     populate_players()
     spawn_boxes()
     prev_update_datetime = datetime.now()
-
-
-def get_state():
-    state = {"active_objects": [],
-             "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
-    damage_events.clear()
-    for object in active_objects:
-        state["active_objects"].append(object.to_dict())
-    return state

@@ -13,6 +13,7 @@ var dmg_dealt;
 var prev_phase = null;
 var canvas = null;
 var menu_players_drawn = false;
+var prev_frame = -1;
 
 var currently_selected = 0;
 
@@ -309,7 +310,7 @@ function draw_menu_players(){
 window.addEventListener("DOMContentLoaded", () => {
     // Initialize the UI.
     canvas = document.querySelector("#game-canvas");
-    const websocket = new WebSocket("ws://34.125.43.84:3389/");
+    const websocket = new WebSocket("ws://192.168.1.67:3389/");
 
 
     hit_sprite.src = "assets/hit_animation.png";
@@ -325,10 +326,13 @@ window.addEventListener("DOMContentLoaded", () => {
             if (object.type == "player")players.push(object);
             if (object.type=="box")boxes.push(object);
         }
-        for (let damage_event of state.damage_events){
-            damage_events.push({x:damage_event.x, y:damage_event.y, dmg:damage_event.damage, frame:0});
-            
+        if (prev_frame!=state.cur_frame){
+            for (let damage_event of state.damage_events){
+                damage_events.push({x:damage_event.x, y:damage_event.y, dmg:damage_event.damage, frame:0});
+            }
+            damage_events.splice(20);
         }
+        prev_frame = state.cur_frame;
         load_player_sprites();
         if (players.length==12 && !menu_players_drawn)draw_menu_players();
       });

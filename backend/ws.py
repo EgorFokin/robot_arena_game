@@ -8,7 +8,7 @@ from datetime import datetime
 
 async def handler(websocket):
     while True:
-        state = game.get_state()
+        state = game.state
         message = json.dumps(state)
         await asyncio.sleep(0.01)
         await websocket.send(message)
