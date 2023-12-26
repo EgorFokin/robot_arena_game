@@ -171,6 +171,18 @@ p,h2,h3{
   font-size: 30px;
 }
 
+#nickname_input{
+  display: block;
+  border-radius: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  color:black;
+  text-align: center;
+  font-size: 15px;
+}
+
 #join_button:hover{
   cursor: pointer;
 }

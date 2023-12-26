@@ -14,6 +14,8 @@ var prev_phase = null;
 var canvas = null;
 var menu_players_drawn = false;
 var prev_frame = -1;
+var websocket;
+var nickname;
 
 var currently_selected = 0;
 
@@ -236,8 +238,20 @@ function game_loop(){
             document.querySelector("main").style.display = "block";
             document.querySelector("#darken").style.display = "block";
             document.querySelector("#next_match_timer").style.display = "block";
+
+            if (state.queue.includes(nickname)){
+                document.querySelector("#join_button").textContent = "position in queue: "+(state.queue.indexOf(nickname)+1);
+                document.querySelector("#join_button").style.fontSize = "15px";
+            }
+            else{
+                document.querySelector("#join_button").textContent = "join!";
+                document.querySelector("#join_button").style.fontSize = "30px";
+            }
+
             if (prev_phase == "game_active"){
                 menu_players_drawn = false;
+                document.querySelector("#nickname_input").readOnly = false;
+                document.querySelector("#nickname_input").style.backgroundColor = "white";
                 
                 if (state.previous_winner == current_bet.team){
                     coins+=current_bet.amount*4;
@@ -301,16 +315,24 @@ function draw_menu_players(){
         player_div.appendChild(player_pendant);
         let player_name = document.createElement("p");
         player_name.innerHTML = player.name;
+        if (player.name == nickname)player_name.style.color = "red";
         player_div.appendChild(player_name);
         document.querySelector(`.team[team=${player.team}]`).appendChild(player_div);
         menu_players_drawn = true;
     }
 }
 
+function join_button_pressed(){
+    nickname = document.querySelector("#nickname_input").value;
+    websocket.send(JSON.stringify({"type":"join","player_name":nickname}));
+    document.querySelector("#nickname_input").readOnly = true;
+    document.querySelector("#nickname_input").style.backgroundColor = "grey";
+}
+
 window.addEventListener("DOMContentLoaded", () => {
     // Initialize the UI.
     canvas = document.querySelector("#game-canvas");
-    const websocket = new WebSocket("ws://192.168.1.67:3389/");
+    websocket = new WebSocket("ws://192.168.1.67:3389/");
 
 
     hit_sprite.src = "assets/hit_animation.png";

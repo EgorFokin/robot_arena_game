@@ -19,6 +19,7 @@ apperances = {
 team_count = 4
 teams = ["red", "blue", "green", "yellow"]
 teams = teams[:team_count]
+queue = []
 
 damage_events = []
 
@@ -56,8 +57,8 @@ def check_for_border_collisions():
     # checks if a player is colliding with the border and if so, changes the velocity accordingly
     global active_objects
     for object in active_objects:
-        if (object.position.y+object.collision_radius > 615):
-            object.position.y = 615 - object.collision_radius
+        if (object.position.y+object.collision_radius > 680):
+            object.position.y = 680 - object.collision_radius
             if type(object) == Box:
                 object.velocity.y = -object.velocity.y*0.2
             else:
@@ -74,8 +75,8 @@ def check_for_border_collisions():
                 object.velocity.x = -object.velocity.x*0.2
             else:
                 object.velocity.x = -object.velocity.x*0.7
-        if (object.position.x+object.collision_radius > 1500):
-            object.position.x = 1500 - object.collision_radius
+        if (object.position.x+object.collision_radius > 1536):
+            object.position.x = 1536 - object.collision_radius
             if type(object) == Box:
                 object.velocity.x = -object.velocity.x*0.2
             else:
@@ -192,7 +193,7 @@ def populate_players():
         team_index = i % team_count
         team_color = teams[team_index]
         head = random.choice(apperances["head"])
-        active_objects.append(Player("player"+str(i),
+        active_objects.append(Player(queue.pop(0) if queue else "Player" + str(i),
                               Vector(random.randint(50, (1500//len(teams))) + (1500//len(teams)) * (team_index),
                               random.randint(50, 550)),
                               Vector(0, 0),
@@ -260,6 +261,7 @@ def end_game():
     global phase, betting_start_time
     phase = "betting"
     betting_start_time = datetime.now()
+    reset()
 
 
 def start_game():
@@ -277,7 +279,6 @@ def start_game():
             for object in active_objects:
                 state["active_objects"].append(object.to_dict())
         elif (phase == "betting"):
-            reset()
             state = {"cur_frame": cur_frame, "active_objects": [],
                      "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
             damage_events.clear()
@@ -285,6 +286,7 @@ def start_game():
                 state["active_objects"].append(object.to_dict())
             if (datetime.now() - betting_start_time > timedelta(seconds=30)):
                 phase = "game_active"
+                prev_update_datetime = datetime.now()
 
 
 def reset():
@@ -292,4 +294,3 @@ def reset():
     active_objects = []
     populate_players()
     spawn_boxes()
-    prev_update_datetime = datetime.now()

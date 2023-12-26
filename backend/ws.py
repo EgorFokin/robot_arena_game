@@ -6,12 +6,24 @@ import threading
 from datetime import datetime
 
 
-async def handler(websocket):
+async def recieve_messages(websocket):
+    async for message in websocket:
+        data = json.loads(message)
+        if data["type"] == "join":
+            game.queue.append(data["player_name"])
+
+
+async def send_messages(websocket):
     while True:
         state = game.state
+        state['queue'] = game.queue
         message = json.dumps(state)
         await asyncio.sleep(0.01)
         await websocket.send(message)
+
+
+async def handler(websocket):
+    await asyncio.gather(recieve_messages(websocket), send_messages(websocket))
 
 
 async def main():
