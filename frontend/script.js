@@ -252,6 +252,7 @@ function game_loop(){
                 menu_players_drawn = false;
                 document.querySelector("#nickname_input").readOnly = false;
                 document.querySelector("#nickname_input").style.backgroundColor = "white";
+                document.querySelector("#join_button").disabled = false;
                 
                 if (state.previous_winner == current_bet.team){
                     coins+=current_bet.amount*4;
@@ -323,9 +324,11 @@ function draw_menu_players(){
 }
 
 function join_button_pressed(){
+    if (state.queue.includes(nickname))return;
     nickname = document.querySelector("#nickname_input").value;
     websocket.send(JSON.stringify({"type":"join","player_name":nickname}));
     document.querySelector("#nickname_input").readOnly = true;
+    document.querySelector("#join_button").disabled = true;
     document.querySelector("#nickname_input").style.backgroundColor = "grey";
 }
 
