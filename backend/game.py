@@ -5,6 +5,7 @@ from vectors import Vector
 import time
 import math
 from game_object import *
+from random_username.generate import generate_username
 
 prev_update_datetime = None
 
@@ -20,6 +21,7 @@ team_count = 4
 teams = ["red", "blue", "green", "yellow"]
 teams = teams[:team_count]
 queue = []
+registered_players_count = 0
 
 damage_events = []
 
@@ -186,14 +188,27 @@ def calculate_collisions():
                         direction)
 
 
-def populate_players():
+def add_players():
     # populates the players list with random players
-    global active_objects
-    for i in range(PLAYER_NUM):
-        team_index = i % team_count
+    global active_objects, registered_players_count
+    while registered_players_count < PLAYER_NUM and len(queue) > 0:
+        registered_players_count += 1
+        team_index = registered_players_count % team_count
         team_color = teams[team_index]
         head = random.choice(apperances["head"])
-        active_objects.append(Player(queue.pop(0) if queue else "Player" + str(i),
+        active_objects.append(Player(queue.pop(0),
+                              Vector(random.randint(50, (1500//len(teams))) + (1500//len(teams)) * (team_index),
+                              random.randint(50, 550)),
+                              Vector(0, 0),
+                              100,
+                              {"head": head, "body": head + "_body", "pendant": random.choice(apperances["pendant"]),
+                              "bracelet": random.choice(apperances["bracelet"]), "weapon": random.choice(apperances["weapon"])}, team_color))
+    if registered_players_count < PLAYER_NUM and (datetime.now() - betting_start_time).seconds/30 > registered_players_count/PLAYER_NUM:
+        registered_players_count += 1
+        team_index = registered_players_count % team_count
+        team_color = teams[team_index]
+        head = random.choice(apperances["head"])
+        active_objects.append(Player(generate_username(1)[0][:-1],
                               Vector(random.randint(50, (1500//len(teams))) + (1500//len(teams)) * (team_index),
                               random.randint(50, 550)),
                               Vector(0, 0),
@@ -273,24 +288,27 @@ def start_game():
             update()
             cur_frame += 1
             cur_frame %= 1e9
-            state = {"cur_frame": cur_frame, "active_objects": [],
-                     "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
+            # state needs to be fully updated in one action because its being used in ws.py
+            state = {"cur_frame": cur_frame, "active_objects": [object.to_dict() for object in active_objects],
+                     "damage_events": damage_events[:], "phase": phase,
+                     "betting_start_timestamp": datetime.timestamp(betting_start_time),
+                     "previous_winner": winner}
             damage_events.clear()
-            for object in active_objects:
-                state["active_objects"].append(object.to_dict())
         elif (phase == "betting"):
-            state = {"cur_frame": cur_frame, "active_objects": [],
-                     "damage_events": damage_events[:], "phase": phase, "betting_start_timestamp": datetime.timestamp(betting_start_time), "previous_winner": winner}
             damage_events.clear()
-            for object in active_objects:
-                state["active_objects"].append(object.to_dict())
+            add_players()
+            # state needs to be fully updated in one action because its being used in ws.py
+            state = {"cur_frame": cur_frame, "active_objects": [object.to_dict() for object in active_objects],
+                     "damage_events": damage_events[:], "phase": phase,
+                     "betting_start_timestamp": datetime.timestamp(betting_start_time),
+                     "previous_winner": winner}
             if (datetime.now() - betting_start_time > timedelta(seconds=30)):
                 phase = "game_active"
                 prev_update_datetime = datetime.now()
 
 
 def reset():
-    global active_objects, prev_update_datetime
+    global active_objects, prev_update_datetime, registered_players_count
     active_objects = []
-    populate_players()
+    registered_players_count = 0
     spawn_boxes()

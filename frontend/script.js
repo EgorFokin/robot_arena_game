@@ -207,6 +207,12 @@ function select_custom(value){
 }
 
 function game_loop(){
+    if (window.innerWidth<window.innerHeight){
+        document.querySelector("#wrong_resolution").style.display = "block";
+        window.requestAnimationFrame(game_loop);
+        return;
+    }
+    document.querySelector("#wrong_resolution").style.display = "none";
     const ctx = canvas.getContext('2d');
     get_coins_from_cookie();
     document.querySelector("#coins_number").innerHTML = coins;
@@ -290,7 +296,7 @@ function game_loop(){
 
 
 function draw_menu_players(){
-
+    console.log("draw_menu_players");
     for (let team of document.querySelectorAll(".team")){
         while (team.firstChild){
             team.removeChild(team.firstChild);
@@ -335,7 +341,7 @@ function join_button_pressed(){
 window.addEventListener("DOMContentLoaded", () => {
     // Initialize the UI.
     canvas = document.querySelector("#game-canvas");
-    websocket = new WebSocket("ws://192.168.1.67:3389/");
+    websocket = new WebSocket("ws://localhost:3389/");
 
 
     hit_sprite.src = "assets/hit_animation.png";
@@ -344,6 +350,7 @@ window.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#coins_number").innerHTML = coins - current_bet.amount;
 
     websocket.addEventListener("message", ({ data }) => {
+        let prev_player_num = players?players.length:0;
         state = JSON.parse(data);
         players = []
         boxes = []
@@ -359,7 +366,8 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         prev_frame = state.cur_frame;
         load_player_sprites();
-        if (players.length==12 && !menu_players_drawn)draw_menu_players();
+        if (state.phase == "betting" && prev_player_num!=players.length)draw_menu_players();
+        //console.log(players.length);
       });
 
 

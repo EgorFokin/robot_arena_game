@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
+    <div id="wrong_resolution">Sorry, your screen resolution is not supported. If you are on a phone,try rotating the screen.</div>
     <header>
         <div id = "coins" class="header_item">
             <img src="assets/coin.png">
@@ -11,12 +12,19 @@
         </div>
         <p id = "current_bet_match"></p>
         <div id = "socials" class="header_item">
-            <img src="assets/instagram.png">
+            <a href="#popup_instructions"><img src="assets/question-mark-50.png"></a>
             <img src="assets/discord.png">
             <img src="assets/twitter.png">
         </div>
         <p id ="next_match_timer">time until next match: 30sec</p>
     </header>
+    <div id="popup_instructions" class="overlay">
+        <div class="popup">
+            <a class="close" href="#">&times;</a>
+            <h2>Game Instructions</h2>
+            
+        </div>
+    </div>
     <main>
         <div id ="bets_menu">
             <div id = "bets_upper_menu">
